@@ -6,7 +6,7 @@
       <LocalizedName description="Flows" languagecode="1033" />
     </LocalizedNames>
     <Descriptions />
-    <Version>1.0.0.3</Version>
+    <Version>1.0.0.4</Version>
     <Managed>0</Managed>
     <Publisher>
       <UniqueName>mzh</UniqueName>
@@ -80,8 +80,18 @@
       </Addresses>
     </Publisher>
     <RootComponents>
+      <RootComponent type="29" id="{1830bda6-358b-f011-b4cb-7c1e5277a969}" behavior="0" />
       <RootComponent type="29" id="{39a52ed1-a589-f011-b4cc-7c1e52362bef}" behavior="0" />
     </RootComponents>
-    <MissingDependencies />
+    <MissingDependencies>
+      <MissingDependency>
+        <Required type="1" schemaName="cicd_housingunit" displayName="HousingUnit" solution="Active" />
+        <Dependent type="29" displayName="Add Tenant when housing unit added" id="{1830bda6-358b-f011-b4cb-7c1e5277a969}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="cicd_tenant" displayName="Tenant" solution="Active" />
+        <Dependent type="29" displayName="Add Tenant when housing unit added" id="{1830bda6-358b-f011-b4cb-7c1e5277a969}" />
+      </MissingDependency>
+    </MissingDependencies>
   </SolutionManifest>
 </ImportExportXml>
