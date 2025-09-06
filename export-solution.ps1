@@ -165,17 +165,17 @@ try {
     Write-Host ""
     
     # Step 4: Export and unpack unmanaged solution
-    Export-AndUnpackSolution -SolutionName $SolutionName -FolderPath "./mainsolution/unmanaged" -IsManaged $false
+    Export-AndUnpackSolution -SolutionName $SolutionName -FolderPath "./$SolutionName/unmanaged" -IsManaged $false
     Write-Host ""
     
     # Step 5: Export and unpack managed solution
-    Export-AndUnpackSolution -SolutionName $SolutionName -FolderPath "./mainsolution/managed" -IsManaged $true
+    Export-AndUnpackSolution -SolutionName $SolutionName -FolderPath "./$SolutionName/managed" -IsManaged $true
     Write-Host ""
     
     Write-Host "🎉 All steps completed successfully!" -ForegroundColor Green
     Write-Host "📁 Solutions exported to:" -ForegroundColor White
-    Write-Host "   - Unmanaged: ./mainsolution/unmanaged" -ForegroundColor Gray
-    Write-Host "   - Managed: ./mainsolution/managed" -ForegroundColor Gray
+    Write-Host "   - Unmanaged: ./$SolutionName/unmanaged" -ForegroundColor Gray
+    Write-Host "   - Managed: ./$SolutionName/managed" -ForegroundColor Gray
     
 } catch {
     Write-Host "❌ Error: $_" -ForegroundColor Red

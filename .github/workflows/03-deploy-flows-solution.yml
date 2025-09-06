@@ -1,0 +1,19 @@
+name: 03-Deploy Flows Solution
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: 
+      - 'flows/**'
+
+permissions:
+  contents: write
+
+jobs:
+  flows:
+    uses: ./.github/workflows/shared-deployment-pipeline.yml
+    with:
+      solution_name: flows    
+    secrets:
+      envSecret: ${{ secrets.PowerPlatformSPN }}
