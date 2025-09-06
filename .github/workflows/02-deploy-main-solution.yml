@@ -14,6 +14,7 @@ jobs:
   main:
     uses: ./.github/workflows/shared-deployment-pipeline.yml
     with:
-      solution_name: main    
+      solution_name: main
+      solution_source_folder: mainsolution    
     secrets:
       envSecret: ${{ secrets.PowerPlatformSPN }}
