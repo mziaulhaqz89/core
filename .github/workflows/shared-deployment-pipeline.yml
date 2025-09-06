@@ -17,7 +17,6 @@ on:
       solution_source_folder: 
         description: 'folder name to be created and checked in *do not change*'
         type: string
-        default: mainsolution
       upgrade_mode:
         description: 'Deployment mode: "update" (default) or "upgrade" (removes deleted components)'
         type: string
