@@ -1,0 +1,19 @@
+name: 02-Deploy Main Solution
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: 
+      - 'mainsolution/**'
+
+permissions:
+  contents: write
+
+jobs:
+  main:
+    uses: ./.github/workflows/shared-deployment-pipeline.yml
+    with:
+      solution_name: main    
+    secrets:
+      envSecret: ${{ secrets.PowerPlatformSPN }}

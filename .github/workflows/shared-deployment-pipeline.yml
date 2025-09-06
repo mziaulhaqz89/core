@@ -1,0 +1,141 @@
+name: Shared Deployment Pipeline
+
+# Reusable workflow for deploying managed solutions from source control
+# Deploy managed solutions directly from source control to TEST, UAT, and PRODUCTION environments
+
+on:
+  workflow_call:
+    inputs: 
+      solution_name:
+        description: 'The solution name.'
+        type: string
+        required: true
+      solution_outbound_folder:
+        description: 'staging the unpacked solution folder before check-in *do not change*'
+        type: string
+        default: out/solutions/
+      solution_source_folder: 
+        description: 'folder name to be created and checked in *do not change*'
+        type: string
+        default: mainsolution/
+      upgrade_mode:
+        description: 'Deployment mode: "update" (default) or "upgrade" (removes deleted components)'
+        type: string
+        default: 'upgrade'
+      target_environment:
+        description: 'Which environment to deploy to: TEST, UAT, PRODUCTION, or ALL'
+        type: string
+        default: 'ALL'
+    secrets:
+      envSecret:
+        description: 'The secret value for authentication using SPN'
+        required: true
+
+jobs:
+  prepare-managed-solution:
+    runs-on: windows-latest
+    env:
+      RUNNER_DEBUG: 1
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Install Power Platform CLI
+      uses: microsoft/powerplatform-actions/actions-install@v1
+
+    - name: Pack managed solution from source control
+      uses: microsoft/powerplatform-actions/pack-solution@v1
+      with:
+        solution-folder: ${{ inputs.solution_source_folder}}/${{ inputs.solution_name }}/managed
+        solution-file: ${{ inputs.solution_outbound_folder}}/${{ inputs.solution_name }}_managed.zip
+        solution-type: Managed
+
+    - name: Upload packed solution artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.solution_name }}-managed-solution
+        path: ${{ inputs.solution_outbound_folder}}/${{ inputs.solution_name }}_managed.zip
+        retention-days: 1
+
+  deploy-to-test:
+    if: inputs.target_environment == 'TEST' || inputs.target_environment == 'ALL'
+    needs: [prepare-managed-solution]
+    runs-on: windows-latest
+    environment: 
+      name: TEST
+      url: ${{ vars.TEST_ENVIRONMENT_URL }}
+    env:
+      RUNNER_DEBUG: 1
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Deploy solution to TEST environment
+      uses: ./.github/actions/deploy-solution
+      with:
+        environment-url: ${{ vars.TEST_ENVIRONMENT_URL }}
+        client-id: ${{ vars.CLIENT_ID }}
+        client-secret: ${{ secrets.envSecret }}
+        tenant-id: ${{ vars.TENANT_ID }}
+        solution-name: ${{ inputs.solution_name }}
+        solution-source-folder: ${{ inputs.solution_source_folder }}
+        solution-outbound-folder: ${{ inputs.solution_outbound_folder }}
+        upgrade-mode: ${{ inputs.upgrade_mode }}
+
+  deploy-to-uat:
+    if: inputs.target_environment == 'UAT' || inputs.target_environment == 'ALL'
+    needs: [prepare-managed-solution, deploy-to-test]
+    runs-on: windows-latest
+    environment: 
+      name: UAT
+      url: ${{ vars.UAT_ENVIRONMENT_URL }}
+    env:
+      RUNNER_DEBUG: 1
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Deploy solution to UAT environment
+      uses: ./.github/actions/deploy-solution
+      with:
+        environment-url: ${{ vars.UAT_ENVIRONMENT_URL }}
+        client-id: ${{ vars.CLIENT_ID }}
+        client-secret: ${{ secrets.envSecret }}
+        tenant-id: ${{ vars.TENANT_ID }}
+        solution-name: ${{ inputs.solution_name }}
+        solution-source-folder: ${{ inputs.solution_source_folder }}
+        solution-outbound-folder: ${{ inputs.solution_outbound_folder }}
+        upgrade-mode: ${{ inputs.upgrade_mode }}
+
+  deploy-to-production:
+    if: inputs.target_environment == 'PRODUCTION' || inputs.target_environment == 'ALL'
+    needs: [prepare-managed-solution, deploy-to-uat]
+    runs-on: windows-latest
+    environment: 
+      name: PRODUCTION
+      url: ${{ vars.PRODUCTION_ENVIRONMENT_URL }}
+    env:
+      RUNNER_DEBUG: 1
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Deploy solution to PRODUCTION environment
+      uses: ./.github/actions/deploy-solution
+      with:
+        environment-url: ${{ vars.PRODUCTION_ENVIRONMENT_URL }}
+        client-id: ${{ vars.CLIENT_ID }}
+        client-secret: ${{ secrets.envSecret }}
+        tenant-id: ${{ vars.TENANT_ID }}
+        solution-name: ${{ inputs.solution_name }}
+        solution-source-folder: ${{ inputs.solution_source_folder }}
+        solution-outbound-folder: ${{ inputs.solution_outbound_folder }}
+        upgrade-mode: ${{ inputs.upgrade_mode }}
