@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{0d4bb8bf-99ea-46e8-9486-3ff2a98e6464}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{9b5d4b34-523d-45c4-9fc4-67542ea10f74}" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{79c4d250-8afb-4888-b2e4-7c6e2db19a6e}">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{e50fb298-5144-4254-9e2e-eb97f6146f9a}">
+                        <labels>
+                          <label description="Lease Name" languagecode="1033" />
+                        </labels>
+                        <control id="cicd_leasename" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="cicd_leasename" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{9bbd63cd-7baf-4d7d-9e9d-c4ddeb0783ce}">
+                        <labels>
+                          <label description="Owner" languagecode="1033" />
+                        </labels>
+                        <control id="ownerid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="ownerid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{519f88c7-c5ba-45bd-b181-86ff43eeb235}">
+                        <labels>
+                          <label description="Tenant" languagecode="1033" />
+                        </labels>
+                        <control id="cicd_tenantid" classid="{270bd3db-d9af-4782-9025-509e298dec0a}" datafieldname="cicd_tenantid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{ef89bf23-4121-483b-9fa8-95100a1b96f4}">
+                        <labels>
+                          <label description="HousingUnit" languagecode="1033" />
+                        </labels>
+                        <control id="cicd_unitid" classid="{270bd3db-d9af-4782-9025-509e298dec0a}" datafieldname="cicd_unitid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{84e056d1-9dcb-420f-aa6b-d96afc75efa9}">
+                        <labels>
+                          <label description="Start Date" languagecode="1033" />
+                        </labels>
+                        <control id="cicd_startdate" classid="{5b773807-9fb2-42db-97c3-7a91eff8adff}" datafieldname="cicd_startdate" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{5bbc219d-d394-4e52-8726-66c45d644fd6}">
+                        <labels>
+                          <label description="End Date" languagecode="1033" />
+                        </labels>
+                        <control id="cicd_enddate" classid="{5b773807-9fb2-42db-97c3-7a91eff8adff}" datafieldname="cicd_enddate" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>

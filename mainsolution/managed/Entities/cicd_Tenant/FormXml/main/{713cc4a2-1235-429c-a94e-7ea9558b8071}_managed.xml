@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{713cc4a2-1235-429c-a94e-7ea9558b8071}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{d8d5b693-4790-4d51-9544-74975b90e280}" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{9bf37c72-4291-4649-9380-ed83602bf6a2}">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{d60302ea-5d90-4d11-a8ec-fca954baa8cd}">
+                        <labels>
+                          <label description="" languagecode="1033" />
+                        </labels>
+                        <control id="cicd_tenantname" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="cicd_tenantname" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{90e14b2c-9ea0-4964-b389-cd6dcfb1bad1}">
+                        <labels>
+                          <label description="" languagecode="1033" />
+                        </labels>
+                        <control id="ownerid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="ownerid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{195c93b5-61f7-4aae-9491-6d036c58faf3}">
+                        <labels>
+                          <label description="" languagecode="1033" />
+                        </labels>
+                        <control id="cicd_phone" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="cicd_phone" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{0337ee1e-a292-4c42-826f-6751834e2bcf}">
+                        <labels>
+                          <label description="" languagecode="1033" />
+                        </labels>
+                        <control id="cicd_email" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="cicd_email" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>
