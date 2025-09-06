@@ -70,7 +70,7 @@ jobs:
     runs-on: windows-latest
     environment: 
       name: TEST
-      url: ${{ vars.TEST_ENVIRONMENT_URL }}
+      url: ${{ vars.ENVIRONMENT_URL }}
     env:
       RUNNER_DEBUG: 1
 
@@ -82,7 +82,7 @@ jobs:
     - name: Deploy solution to TEST environment
       uses: ./.github/actions/deploy-solution
       with:
-        environment-url: ${{ vars.TEST_ENVIRONMENT_URL }}
+        environment-url: ${{ vars.ENVIRONMENT_URL }}
         client-id: ${{ vars.CLIENT_ID }}
         client-secret: ${{ secrets.envSecret }}
         tenant-id: ${{ vars.TENANT_ID }}
@@ -97,7 +97,7 @@ jobs:
     runs-on: windows-latest
     environment: 
       name: UAT
-      url: ${{ vars.UAT_ENVIRONMENT_URL }}
+      url: ${{ vars.ENVIRONMENT_URL }}
     env:
       RUNNER_DEBUG: 1
 
@@ -109,7 +109,7 @@ jobs:
     - name: Deploy solution to UAT environment
       uses: ./.github/actions/deploy-solution
       with:
-        environment-url: ${{ vars.UAT_ENVIRONMENT_URL }}
+        environment-url: ${{ vars.ENVIRONMENT_URL }}
         client-id: ${{ vars.CLIENT_ID }}
         client-secret: ${{ secrets.envSecret }}
         tenant-id: ${{ vars.TENANT_ID }}
@@ -124,7 +124,7 @@ jobs:
     runs-on: windows-latest
     environment: 
       name: PRODUCTION
-      url: ${{ vars.PRODUCTION_ENVIRONMENT_URL }}
+      url: ${{ vars.ENVIRONMENT_URL }}
     env:
       RUNNER_DEBUG: 1
 
@@ -136,7 +136,7 @@ jobs:
     - name: Deploy solution to PRODUCTION environment
       uses: ./.github/actions/deploy-solution
       with:
-        environment-url: ${{ vars.PRODUCTION_ENVIRONMENT_URL }}
+        environment-url: ${{ vars.ENVIRONMENT_URL }}
         client-id: ${{ vars.CLIENT_ID }}
         client-secret: ${{ secrets.envSecret }}
         tenant-id: ${{ vars.TENANT_ID }}
