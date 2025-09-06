@@ -17,13 +17,13 @@ inputs:
     description: 'Name of the solution to deploy'
     required: true
   solution-source-folder:
-    description: 'Source folder containing the solution structure (mainsolution/)'
+    description: 'Source folder containing the solution structure (mainsolution)'
     required: true
-    default: 'mainsolution/'
+    default: 'mainsolution'
   solution-outbound-folder:
-    description: 'Folder containing the packed solution file (out/solutions/)'
+    description: 'Folder containing the packed solution file (out/solutions)'
     required: true
-    default: 'out/solutions/'
+    default: 'out/solutions'
   upgrade-mode:
     description: 'Deployment mode: "update" (default, keeps deleted components) or "upgrade" (removes deleted components)'
     required: false
@@ -109,7 +109,7 @@ runs:
         app-id: ${{ inputs.client-id }}
         client-secret: ${{ inputs.client-secret }}
         tenant-id: ${{ inputs.tenant-id }}
-        solution-file: ${{ inputs.solution-outbound-folder }}${{ inputs.solution-name }}_managed.zip
+        solution-file: ${{ inputs.solution-outbound-folder }}/${{ inputs.solution-name }}_managed.zip
         force-overwrite: true
         publish-changes: true
         activate-plugins: true
@@ -124,7 +124,7 @@ runs:
         app-id: ${{ inputs.client-id }}
         client-secret: ${{ inputs.client-secret }}
         tenant-id: ${{ inputs.tenant-id }}
-        solution-file: ${{ inputs.solution-outbound-folder }}${{ inputs.solution-name }}_managed.zip
+        solution-file: ${{ inputs.solution-outbound-folder }}/${{ inputs.solution-name }}_managed.zip
         stage-and-upgrade: true
         publish-changes: true
         activate-plugins: true

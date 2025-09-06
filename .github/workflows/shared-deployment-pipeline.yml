@@ -13,11 +13,11 @@ on:
       solution_outbound_folder:
         description: 'staging the unpacked solution folder before check-in *do not change*'
         type: string
-        default: out/solutions/
+        default: out/solutions
       solution_source_folder: 
         description: 'folder name to be created and checked in *do not change*'
         type: string
-        default: mainsolution/
+        default: mainsolution
       upgrade_mode:
         description: 'Deployment mode: "update" (default) or "upgrade" (removes deleted components)'
         type: string
@@ -45,10 +45,15 @@ jobs:
     - name: Install Power Platform CLI
       uses: microsoft/powerplatform-actions/actions-install@v1
 
+    - name: Create output directory
+      shell: pwsh
+      run: |
+        New-Item -ItemType Directory -Force -Path "${{ inputs.solution_outbound_folder}}"
+
     - name: Pack managed solution from source control
       uses: microsoft/powerplatform-actions/pack-solution@v1
       with:
-        solution-folder: ${{ inputs.solution_source_folder}}/${{ inputs.solution_name }}/managed
+        solution-folder: ${{ inputs.solution_source_folder}}/managed
         solution-file: ${{ inputs.solution_outbound_folder}}/${{ inputs.solution_name }}_managed.zip
         solution-type: Managed
 
