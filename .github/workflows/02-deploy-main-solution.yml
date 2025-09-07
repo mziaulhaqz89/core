@@ -5,7 +5,7 @@ on:
   push:
     branches: [main]
     paths: 
-      - 'mainsolution/**'
+      - 'main/**'
 
 permissions:
   contents: write
@@ -15,6 +15,6 @@ jobs:
     uses: ./.github/workflows/shared-deployment-pipeline.yml
     with:
       solution_name: main
-      solution_source_folder: mainsolution    
+      solution_source_folder: main    
     secrets:
       envSecret: ${{ secrets.PowerPlatformSPN }}
