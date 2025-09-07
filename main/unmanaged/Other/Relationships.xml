@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<EntityRelationships xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <EntityRelationship Name="business_unit_cicd_housingunit" />
+  <EntityRelationship Name="business_unit_cicd_lease" />
+  <EntityRelationship Name="business_unit_cicd_tenant" />
+  <EntityRelationship Name="cicd_Lease_cicd_HousingUnit" />
+  <EntityRelationship Name="cicd_Lease_cicd_Tenant" />
+  <EntityRelationship Name="lk_cicd_housingunit_createdby" />
+  <EntityRelationship Name="lk_cicd_housingunit_modifiedby" />
+  <EntityRelationship Name="lk_cicd_lease_createdby" />
+  <EntityRelationship Name="lk_cicd_lease_modifiedby" />
+  <EntityRelationship Name="lk_cicd_tenant_createdby" />
+  <EntityRelationship Name="lk_cicd_tenant_modifiedby" />
+  <EntityRelationship Name="owner_cicd_housingunit" />
+  <EntityRelationship Name="owner_cicd_lease" />
+  <EntityRelationship Name="owner_cicd_tenant" />
+  <EntityRelationship Name="team_cicd_housingunit" />
+  <EntityRelationship Name="team_cicd_lease" />
+  <EntityRelationship Name="team_cicd_tenant" />
+  <EntityRelationship Name="TransactionCurrency_cicd_HousingUnit" />
+  <EntityRelationship Name="user_cicd_housingunit" />
+  <EntityRelationship Name="user_cicd_lease" />
+  <EntityRelationship Name="user_cicd_tenant" />
+</EntityRelationships>

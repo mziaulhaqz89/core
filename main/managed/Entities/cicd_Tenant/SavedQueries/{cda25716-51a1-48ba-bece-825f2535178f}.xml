@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{cda25716-51a1-48ba-bece-825f2535178f}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="cicd_tenantname" select="1" icon="1" preview="1">
+        <row name="result" id="cicd_tenantid">
+          <cell name="cicd_tenantname" width="300" />
+          <cell name="cicd_phone" width="150" />
+          <cell name="cicd_email" width="150" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="cicd_tenant">
+          <attribute name="cicd_tenantid" />
+          <attribute name="cicd_tenantname" />
+          <attribute name="createdon" />
+          <order attribute="cicd_tenantname" descending="false" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+          </filter>
+          <attribute name="cicd_phone" />
+          <attribute name="cicd_email" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Active Tenants" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>
