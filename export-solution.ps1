@@ -17,7 +17,8 @@
 #>
 
 param(
-    [string]$SolutionName = "main",
+    [Parameter(Mandatory=$true)]
+    [string]$SolutionName,
     [ValidateSet("patch", "minor", "major")]
     [string]$VersionType = "patch"
 )
