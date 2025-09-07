@@ -11,9 +11,11 @@
   <EntityRelationship Name="lk_cicd_lease_modifiedby" />
   <EntityRelationship Name="lk_cicd_tenant_createdby" />
   <EntityRelationship Name="lk_cicd_tenant_modifiedby" />
+  <EntityRelationship Name="msa_account_managingpartner" />
   <EntityRelationship Name="owner_cicd_housingunit" />
   <EntityRelationship Name="owner_cicd_lease" />
   <EntityRelationship Name="owner_cicd_tenant" />
+  <EntityRelationship Name="powerpagecomponent_mspp_webrole_account" />
   <EntityRelationship Name="team_cicd_housingunit" />
   <EntityRelationship Name="team_cicd_lease" />
   <EntityRelationship Name="team_cicd_tenant" />
