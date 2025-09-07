@@ -1,0 +1,20 @@
+name: 04-Deploy WebResources Solution
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: 
+      - 'webresources/**'
+
+permissions:
+  contents: write
+
+jobs:
+  webresources:
+    uses: ./.github/workflows/shared-deployment-pipeline.yml
+    with:
+      solution_name: webresources
+      solution_source_folder: webresources    
+    secrets:
+      envSecret: ${{ secrets.PowerPlatformSPN }}
