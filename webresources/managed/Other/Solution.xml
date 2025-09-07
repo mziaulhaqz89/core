@@ -6,7 +6,7 @@
       <LocalizedName description="webresources" languagecode="1033" />
     </LocalizedNames>
     <Descriptions />
-    <Version>1.0.0.1</Version>
+    <Version>1.0.0.2</Version>
     <Managed>1</Managed>
     <Publisher>
       <UniqueName>cicdpoc</UniqueName>
@@ -79,7 +79,6 @@
     </Publisher>
     <RootComponents>
       <RootComponent type="61" schemaName="cicd_mzh_accountform" behavior="0" />
-      <RootComponent type="61" schemaName="cicd_stw_account" behavior="0" />
     </RootComponents>
     <MissingDependencies />
   </SolutionManifest>
