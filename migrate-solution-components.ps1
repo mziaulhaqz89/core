@@ -409,6 +409,85 @@ try {
         exit 1
     }
     
+    # Display component migration mapping
+    Write-Host "`n🗺️  Component Migration Mapping:" -ForegroundColor Magenta
+    Write-Host "══════════════════════════════════════════════════════════════════════════════════════════════" -ForegroundColor Magenta
+    Write-Host "This script will automatically migrate components from your feature solution to target solutions" -ForegroundColor Cyan
+    Write-Host "based on their component types as follows:" -ForegroundColor Cyan
+    Write-Host ""
+    
+    # Create a beautiful table showing the mapping
+    Write-Host "┌─────────────┬─────────────────────────────────────────┬─────────────────────────────────┐" -ForegroundColor DarkCyan
+    Write-Host "│ Component   │ Component Type                          │ Target Solution                 │" -ForegroundColor DarkCyan
+    Write-Host "│ Type ID     │                                         │                                 │" -ForegroundColor DarkCyan
+    Write-Host "├─────────────┼─────────────────────────────────────────┼─────────────────────────────────┤" -ForegroundColor DarkCyan
+    
+    # Connection Reference
+    Write-Host "│ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "10112".PadRight(11) -ForegroundColor Yellow -NoNewline
+    Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "Connection Reference".PadRight(39) -ForegroundColor White -NoNewline
+    Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "connectionreference".PadRight(31) -ForegroundColor Green -NoNewline
+    Write-Host " │" -ForegroundColor DarkCyan
+    
+    # Process/Flow
+    Write-Host "│ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "29".PadRight(11) -ForegroundColor Yellow -NoNewline
+    Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "Process/Flow".PadRight(39) -ForegroundColor White -NoNewline
+    Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "flows".PadRight(31) -ForegroundColor Green -NoNewline
+    Write-Host " │" -ForegroundColor DarkCyan
+    
+    # Web Resource
+    Write-Host "│ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "61".PadRight(11) -ForegroundColor Yellow -NoNewline
+    Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "Web Resource".PadRight(39) -ForegroundColor White -NoNewline
+    Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "webresources".PadRight(31) -ForegroundColor Green -NoNewline
+    Write-Host " │" -ForegroundColor DarkCyan
+    
+    # Plugin Assembly
+    Write-Host "│ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "91".PadRight(11) -ForegroundColor Yellow -NoNewline
+    Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "Plugin Assembly".PadRight(39) -ForegroundColor White -NoNewline
+    Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "plugins".PadRight(31) -ForegroundColor Green -NoNewline
+    Write-Host " │" -ForegroundColor DarkCyan
+    
+    # SDK Message Processing Step
+    Write-Host "│ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "92".PadRight(11) -ForegroundColor Yellow -NoNewline
+    Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "SDK Message Processing Step".PadRight(39) -ForegroundColor White -NoNewline
+    Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "plugins".PadRight(31) -ForegroundColor Green -NoNewline
+    Write-Host " │" -ForegroundColor DarkCyan
+    
+    # Default (All other types)
+    Write-Host "│ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "Others".PadRight(11) -ForegroundColor Yellow -NoNewline
+    Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "All Other Component Types".PadRight(39) -ForegroundColor White -NoNewline
+    Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "main".PadRight(31) -ForegroundColor Green -NoNewline
+    Write-Host " │" -ForegroundColor DarkCyan
+    
+    Write-Host "└─────────────┴─────────────────────────────────────────┴─────────────────────────────────┘" -ForegroundColor DarkCyan
+    
+    Write-Host "`n📋 Migration Process:" -ForegroundColor Cyan
+    Write-Host "  1️⃣  Retrieve components from your specified feature solution" -ForegroundColor Gray
+    Write-Host "  2️⃣  Analyze each component's type" -ForegroundColor Gray
+    Write-Host "  3️⃣  Move components to appropriate target solutions using PAC CLI" -ForegroundColor Gray
+    Write-Host "  4️⃣  Provide detailed migration summary" -ForegroundColor Gray
+    
+    Write-Host "`n⚠️  Prerequisites:" -ForegroundColor Yellow
+    Write-Host "  • Target solutions (main, connectionreference, flows, webresources, plugins) must exist" -ForegroundColor Gray
+    Write-Host "  • You must have appropriate permissions to modify solutions" -ForegroundColor Gray
+    
     # Prompt for feature solution name
     Write-Host "`n📝 Please provide the feature solution details:" -ForegroundColor Yellow
     Write-Host "Enter the unique name of the feature solution (e.g., 'FeatureSolution1'):" -ForegroundColor Cyan -NoNewline
