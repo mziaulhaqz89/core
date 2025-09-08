@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SdkMessageProcessingStep Name="Microsoft.CDS.DataLakeDataProvider.Plugins.CreateSynapseVEPlugin: Create of msdyn_insightsstorevirtualentity" SdkMessageProcessingStepId="{23ff6bda-b87c-482d-a0f2-4e9f4e8907cd}" unmodified="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SdkMessageId>9ebdbb1b-ea3e-db11-86a7-000a3a5473e8</SdkMessageId>
+  <PluginTypeName>Microsoft.CDS.DataLakeDataProvider.Plugins.CreateSynapseVEPlugin, Microsoft.CDS.DataLakeDataProvider.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35</PluginTypeName>
+  <PluginTypeId>f49c73ff-3013-4f68-ad1a-3e1011cf48b1</PluginTypeId>
+  <PrimaryEntity>msdyn_insightsstorevirtualentity</PrimaryEntity>
+</SdkMessageProcessingStep>

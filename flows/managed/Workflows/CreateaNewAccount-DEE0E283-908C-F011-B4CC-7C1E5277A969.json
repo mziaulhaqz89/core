@@ -1,0 +1,90 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps_1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "mzh_sharedcommondataserviceforapps_47aa8"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "af436c24-a1d9-4c47-9fa4-b51f44deb6cd"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "AccountName",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your Account Name",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "Description",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter Description",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text",
+                "text_1"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Add_a_new_row": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "d8562ee6-692f-46fe-82c4-d5d0623de06e"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps_1",
+              "operationId": "CreateRecord",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "entityName": "accounts",
+              "item/name": "@triggerBody()['text']",
+              "item/description": "@triggerBody()['text_1']"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WebResource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <WebResourceId>{6e1b5c84-a28c-f011-b4cc-7c1e5277a969}</WebResourceId>
+  <Name>cicd_leaseform</Name>
+  <DisplayName>mzh_leaseform</DisplayName>
+  <WebResourceType>3</WebResourceType>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsEnabledForMobileClient>0</IsEnabledForMobileClient>
+  <IsAvailableForMobileOffline>0</IsAvailableForMobileOffline>
+  <IsCustomizable>1</IsCustomizable>
+  <CanBeDeleted>1</CanBeDeleted>
+  <IsHidden>0</IsHidden>
+  <FileName>/WebResources/cicd_leaseform6E1B5C84-A28C-F011-B4CC-7C1E5277A969</FileName>
+</WebResource>
