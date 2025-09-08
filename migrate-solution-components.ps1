@@ -149,22 +149,53 @@ function Format-ComponentsOutput {
         Write-Host "Total components found: $($ComponentsData.value.Count)" -ForegroundColor Yellow
         Write-Host ""
         
-        # Display components in a formatted table
-        $ComponentsData.value | ForEach-Object {
+        # Prepare data for table formatting
+        $tableData = $ComponentsData.value | ForEach-Object {
             $displayName = if ($_.msdyn_displayname) { $_.msdyn_displayname } else { "(No display name)" }
-            $schemaName = if ($_.msdyn_schemaname) { $_.msdyn_schemaname } else { "(No schema name)" }
             $componentType = $_.msdyn_componenttype
             $componentTypeName = if ($_.msdyn_componenttypename) { $_.msdyn_componenttypename } else { "(No type name)" }
             
-            Write-Host "� $displayName" -ForegroundColor White
-            Write-Host "   Schema: $schemaName" -ForegroundColor Gray
-            Write-Host "   Type: $componentType ($componentTypeName)" -ForegroundColor Gray
-            Write-Host ""
+            # Truncate long names for better table display
+            $truncatedDisplayName = if ($displayName.Length -gt 60) { $displayName.Substring(0, 57) + "..." } else { $displayName }
+            $truncatedTypeName = if ($componentTypeName.Length -gt 35) { $componentTypeName.Substring(0, 32) + "..." } else { $componentTypeName }
+            
+            [PSCustomObject]@{
+                "Display Name" = $truncatedDisplayName
+                "Type ID" = $componentType
+                "Type Name" = $truncatedTypeName
+            }
         }
         
-        Write-Host "📊 Detailed JSON Response:" -ForegroundColor Cyan
-        Write-Host "==========================" -ForegroundColor Cyan
-        $ComponentsData | ConvertTo-Json -Depth 10 | Write-Host
+        # Display the table with colors
+        Write-Host "┌──────────────────────────────────────────────────────────────┬─────────┬─────────────────────────────────────┐" -ForegroundColor Cyan
+        Write-Host "│ Display Name                                                 │ Type ID │ Type Name                           │" -ForegroundColor Cyan
+        Write-Host "├──────────────────────────────────────────────────────────────┼─────────┼─────────────────────────────────────┤" -ForegroundColor Cyan
+        
+        foreach ($row in $tableData) {
+            $displayNameFormatted = $row."Display Name".PadRight(60)
+            $typeIdFormatted = $row."Type ID".ToString().PadRight(7)
+            $typeNameFormatted = $row."Type Name".PadRight(35)
+            
+            Write-Host "│ " -ForegroundColor Cyan -NoNewline
+            Write-Host $displayNameFormatted -ForegroundColor White -NoNewline
+            Write-Host " │ " -ForegroundColor Cyan -NoNewline
+            Write-Host $typeIdFormatted -ForegroundColor Yellow -NoNewline
+            Write-Host " │ " -ForegroundColor Cyan -NoNewline
+            Write-Host $typeNameFormatted -ForegroundColor Green -NoNewline
+            Write-Host " │" -ForegroundColor Cyan
+        }
+        
+        Write-Host "└──────────────────────────────────────────────────────────────┴─────────┴─────────────────────────────────────┘" -ForegroundColor Cyan
+        
+        # Display component type summary
+        Write-Host "`n📊 Component Type Summary:" -ForegroundColor Cyan
+        Write-Host "─────────────────────────" -ForegroundColor Cyan
+        $ComponentsData.value | Group-Object msdyn_componenttype | Sort-Object Name | ForEach-Object {
+            $typeName = ($_.Group[0].msdyn_componenttypename -replace "Customization\.Type_", "")
+            Write-Host "  📦 Type $($_.Name): $($_.Count) components ($typeName)" -ForegroundColor White
+        }
+        
+        Write-Host "`n💡 Tip: Use 'Y' to proceed with migration or 'N' to cancel" -ForegroundColor Yellow
     }
     else {
         Write-Host "No components found." -ForegroundColor Yellow
