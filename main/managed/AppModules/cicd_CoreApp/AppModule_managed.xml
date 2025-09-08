@@ -10,9 +10,11 @@
   <ClientType>4</ClientType>
   <NavigationType>0</NavigationType>
   <AppModuleComponents>
+    <AppModuleComponent type="1" schemaName="account" />
     <AppModuleComponent type="1" schemaName="cicd_housingunit" />
     <AppModuleComponent type="1" schemaName="cicd_lease" />
     <AppModuleComponent type="1" schemaName="cicd_tenant" />
+    <AppModuleComponent type="1" schemaName="contact" />
     <AppModuleComponent type="62" schemaName="cicd_CoreApp" />
   </AppModuleComponents>
   <AppModuleRoleMaps>
