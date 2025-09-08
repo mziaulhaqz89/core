@@ -38,9 +38,8 @@ param()
     Generated for solution component management
 #>
 
-# Dynamics 365 endpoint - Enhanced to get component IDs
-#$D365Endpoint = "https://mzhdev.crm4.dynamics.com/api/data/v9.0/contacts?`$select=firstname,lastname"
-$D365Endpoint = "https://mzhdev.crm4.dynamics.com/api/data/v9.0/msdyn_solutioncomponentsummaries?`$filter=(msdyn_solutionid%20eq%20d792f061-a28c-f011-b4cc-7c1e52362bef)&`$select=msdyn_displayname,msdyn_schemaname,msdyn_componenttype,msdyn_componenttypename,msdyn_objectid&`$orderby=msdyn_componenttype"
+# Dynamics 365 base endpoint
+$D365BaseEndpoint = "https://mzhdev.crm4.dynamics.com/api/data/v9.0"
 
 function Get-AccessTokenForDataverse {
     try {
@@ -100,6 +99,38 @@ function Invoke-D365WebApi {
         if ($_.Exception.Response) {
             Write-Host "Status Code: $($_.Exception.Response.StatusCode)" -ForegroundColor Red
         }
+        throw
+    }
+}
+
+function Get-SolutionId {
+    <#
+    .SYNOPSIS
+    Gets the solution ID from Dataverse by solution unique name
+    #>
+    param(
+        [string]$SolutionName,
+        [string]$AccessToken,
+        [string]$BaseEndpoint
+    )
+    
+    try {
+        Write-Host "🔍 Looking up solution ID for '$SolutionName'..." -ForegroundColor Cyan
+        
+        $solutionEndpoint = "$BaseEndpoint/solutions?`$filter=uniquename eq '$SolutionName'&`$select=solutionid,uniquename,friendlyname"
+        $solutionResponse = Invoke-D365WebApi -Endpoint $solutionEndpoint -AccessToken $AccessToken
+        
+        if ($solutionResponse.value -and $solutionResponse.value.Count -gt 0) {
+            $solution = $solutionResponse.value[0]
+            $solutionId = $solution.solutionid
+            Write-Host "✅ Found solution: $($solution.friendlyname) (ID: $solutionId)" -ForegroundColor Green
+            return $solutionId
+        } else {
+            throw "Solution '$SolutionName' not found in the environment"
+        }
+    }
+    catch {
+        Write-Host "❌ Failed to get solution ID: $($_.Exception.Message)" -ForegroundColor Red
         throw
     }
 }
@@ -347,11 +378,28 @@ try {
         exit 1
     }
     
+    # Prompt for feature solution name
+    Write-Host "`n📝 Please provide the feature solution details:" -ForegroundColor Yellow
+    Write-Host "Enter the unique name of the feature solution (e.g., 'FeatureSolution1'):" -ForegroundColor Cyan -NoNewline
+    $featureSolutionName = Read-Host " "
+    
+    if ([string]::IsNullOrWhiteSpace($featureSolutionName)) {
+        throw "Feature solution name is required. Please provide a valid solution name."
+    }
+    
+    Write-Host "Using feature solution: '$featureSolutionName'" -ForegroundColor Green
+    
     # Get access token for API calls
     $accessToken = Get-AccessTokenForDataverse
     
+    # Get the solution ID from Dataverse
+    $solutionId = Get-SolutionId -SolutionName $featureSolutionName -AccessToken $accessToken -BaseEndpoint $D365BaseEndpoint
+    
+    # Build the endpoint for solution components
+    $componentsEndpoint = "$D365BaseEndpoint/msdyn_solutioncomponentsummaries?`$filter=(msdyn_solutionid eq $solutionId)&`$select=msdyn_displayname,msdyn_schemaname,msdyn_componenttype,msdyn_componenttypename,msdyn_objectid&`$orderby=msdyn_componenttype"
+    
     # Make the API call to get solution components
-    $componentsData = Invoke-D365WebApi -Endpoint $D365Endpoint -AccessToken $accessToken
+    $componentsData = Invoke-D365WebApi -Endpoint $componentsEndpoint -AccessToken $accessToken
     
     # Format and display results
     Format-ComponentsOutput -ComponentsData $componentsData
