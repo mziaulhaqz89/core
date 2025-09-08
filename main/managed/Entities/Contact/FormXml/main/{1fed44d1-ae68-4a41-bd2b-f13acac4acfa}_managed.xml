@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{1fed44d1-ae68-4a41-bd2b-f13acac4acfa}</formid>
+    <IntroducedVersion>5.0.0.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form showImage="true" headerdensity="HighWithControls" solutionaction="Modified">
+      <events>
+        <event name="onload" application="true" active="true">
+          <Handlers solutionaction="Added">
+            <Handler functionName="cds.ContactForm.onLoad" libraryName="cicd_contactform" handlerUniqueId="{422509b7-a8e5-46ca-9b95-6be4ad66d209}" enabled="true" parameters="" passExecutionContext="true" ordinalvalue="0" />
+          </Handlers>
+        </event>
+      </events>
+      <footer id="{89b89dbf-8deb-4ba7-a9af-7324e1aba434}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left" solutionaction="Added">
+        <rows>
+          <row>
+            <cell id="{58ee4c0a-4f0a-414f-a25a-c2ba436d75a8}" showlabel="false" ordinalvalue="10000">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{952bb525-71a4-4fc1-ae82-0d4cfb95c3ef}" showlabel="false" ordinalvalue="20001">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{1ef93ea2-6bd7-4131-9174-1cde333a0c32}" showlabel="false" ordinalvalue="30002">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <formLibraries solutionaction="Added">
+        <Library name="cicd_contactform" libraryUniqueId="{5eda100e-5b17-4f50-85eb-1f7e8d40147c}" />
+      </formLibraries>
+    </form>
+    <LocalizedNames>
+      <LocalizedName description="Contact" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="Updated default Contact form." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>
