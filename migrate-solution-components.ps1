@@ -201,13 +201,12 @@ function Get-TargetSolutionName {
     param($ComponentType)
     
     switch ($ComponentType) {
-        1 { return "main" }           # Entity -> main solution
         10112 { return "connectionreference" }  # Connection Reference -> connectionreference solution
         29 { return "flows" }         # Process -> flows solution
         61 { return "webresources" }  # Web Resource -> webresources solution
         91 { return "plugins" }       # Plugin Assembly -> plugins solution
         92 { return "plugins" }       # SDK Message Processing Step -> plugins solution
-        default { return $null }      # Unknown type
+        default { return "main" }      # Unknown type -> main solution
     }
 }
 
@@ -215,9 +214,9 @@ function Move-ComponentToSolution {
     <#
     .SYNOPSIS
     Moves a component to the appropriate target solution using PAC CLI
+    Uses ObjectId as the primary identifier for reliability
     #>
     param(
-        [string]$ComponentName,
         [string]$ComponentType,
         [string]$TargetSolution,
         [string]$DisplayName,
@@ -227,31 +226,19 @@ function Move-ComponentToSolution {
     try {
         Write-Host "🔄 Moving component '$DisplayName' to solution '$TargetSolution'..." -ForegroundColor Cyan
         
-        # Determine the best component identifier to use
-        $componentIdentifier = $ComponentName
-        if (-not $ComponentName -or $ComponentName -eq "(No schema name)" -or [string]::IsNullOrWhiteSpace($ComponentName)) {
-            if ($ObjectId -and $ObjectId -ne $null) {
-                $componentIdentifier = $ObjectId
-                Write-Host "Using ObjectId as identifier: $ObjectId" -ForegroundColor Gray
-            } else {
-                $componentIdentifier = $DisplayName
-                Write-Host "Using DisplayName as identifier: $DisplayName" -ForegroundColor Gray
-            }
-        } else {
-            Write-Host "Using SchemaName as identifier: $ComponentName" -ForegroundColor Gray
+        # Validate ObjectId is available
+        if (-not $ObjectId -or $ObjectId -eq "(No object ID)" -or [string]::IsNullOrWhiteSpace($ObjectId)) {
+            Write-Host "❌ No ObjectId available for component '$DisplayName'" -ForegroundColor Red
+            return $false
         }
         
-        # Special handling for different component types
-        $pacCommand = ""
-        switch ($ComponentType) {
-            10112 { 
-                # Connection Reference - use correct component type name format
-                $pacCommand = "pac solution add-solution-component --solutionUniqueName `"$TargetSolution`" --component `"$componentIdentifier`" --componentType `"ConnectionReference`""
-            }
-            default {
-                # Standard approach for other component types
-                $pacCommand = "pac solution add-solution-component --solutionUniqueName `"$TargetSolution`" --component `"$componentIdentifier`" --componentType $ComponentType"
-            }
+        Write-Host "Using ObjectId as identifier: $ObjectId" -ForegroundColor Gray
+        
+        # Build PAC CLI command - use special handling for Connection Reference
+        $pacCommand = if ($ComponentType -eq 10112) {
+            "pac solution add-solution-component --solutionUniqueName `"$TargetSolution`" --component `"$ObjectId`" --componentType `"ConnectionReference`""
+        } else {
+            "pac solution add-solution-component --solutionUniqueName `"$TargetSolution`" --component `"$ObjectId`" --componentType $ComponentType"
         }
         
         Write-Host "Executing: $pacCommand" -ForegroundColor Gray
@@ -265,22 +252,6 @@ function Move-ComponentToSolution {
         } else {
             Write-Host "❌ Failed to move '$DisplayName' to '$TargetSolution' solution" -ForegroundColor Red
             Write-Host "Error output: $result" -ForegroundColor Red
-            
-            # Try alternative approach with ObjectId if schema name failed
-            if ($ComponentName -and $ObjectId -and $ComponentName -ne $ObjectId) {
-                Write-Host "🔄 Retrying with ObjectId..." -ForegroundColor Yellow
-                $retryCommand = switch ($ComponentType) {
-                    10112 { "pac solution add-solution-component --solutionUniqueName `"$TargetSolution`" --component `"$ObjectId`" --componentType `"ConnectionReference`"" }
-                    default { "pac solution add-solution-component --solutionUniqueName `"$TargetSolution`" --component `"$ObjectId`" --componentType $ComponentType" }
-                }
-                
-                $retryResult = Invoke-Expression $retryCommand 2>&1
-                if ($LASTEXITCODE -eq 0) {
-                    Write-Host "✅ Successfully moved '$DisplayName' to '$TargetSolution' solution (using ObjectId)" -ForegroundColor Green
-                    return $true
-                }
-            }
-            
             return $false
         }
     }
@@ -330,7 +301,7 @@ function Process-ComponentMigration {
                 $migrationResults.ByTarget[$targetSolution] = @{ Success = 0; Failed = 0 }
             }
             
-            $success = Move-ComponentToSolution -ComponentName $schemaName -ComponentType $componentType -TargetSolution $targetSolution -DisplayName $displayName -ObjectId $objectId
+            $success = Move-ComponentToSolution -ComponentType $componentType -TargetSolution $targetSolution -DisplayName $displayName -ObjectId $objectId
             
             if ($success) {
                 $migrationResults.Successful++
