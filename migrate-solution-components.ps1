@@ -525,6 +525,46 @@ try {
         if ($shouldContinue) {
             # Process component migration
             Process-ComponentMigration -ComponentsData $componentsData
+            
+            # Ask user if they want to delete the feature solution
+            Write-Host "`n🗑️  Feature Solution Cleanup:" -ForegroundColor Magenta
+            Write-Host "=============================" -ForegroundColor Magenta
+            Write-Host "Now that components have been migrated to their respective target solutions," -ForegroundColor Cyan
+            Write-Host "you may want to delete the original feature solution '$featureSolutionName'." -ForegroundColor Cyan
+            Write-Host ""
+            Write-Host "⚠️  Warning: This action cannot be undone!" -ForegroundColor Red
+            Write-Host "💡 Only proceed if you're certain all components have been migrated successfully." -ForegroundColor Yellow
+            Write-Host ""
+            Write-Host "❓ Do you want to delete the feature solution '$featureSolutionName'? (Y/N): " -ForegroundColor Yellow -NoNewline
+            $deleteResponse = Read-Host
+            
+            if ($deleteResponse -eq 'Y' -or $deleteResponse -eq 'y') {
+                try {
+                    Write-Host "`n🔄 Deleting feature solution '$featureSolutionName'..." -ForegroundColor Cyan
+                    
+                    # Execute PAC CLI command to delete the solution
+                    $deleteCommand = "pac solution delete --solution-name `"$featureSolutionName`""
+                    Write-Host "Executing: $deleteCommand" -ForegroundColor Gray
+                    
+                    $deleteResult = Invoke-Expression $deleteCommand 2>&1
+                    
+                    if ($LASTEXITCODE -eq 0) {
+                        Write-Host "✅ Successfully deleted feature solution '$featureSolutionName'" -ForegroundColor Green
+                        Write-Host "🎯 All components have been migrated and the original solution has been cleaned up!" -ForegroundColor Green
+                    } else {
+                        Write-Host "❌ Failed to delete feature solution '$featureSolutionName'" -ForegroundColor Red
+                        Write-Host "Error output: $deleteResult" -ForegroundColor Red
+                        Write-Host "💡 You may need to delete it manually from the Power Platform admin center." -ForegroundColor Yellow
+                    }
+                }
+                catch {
+                    Write-Host "❌ Exception while deleting solution: $($_.Exception.Message)" -ForegroundColor Red
+                    Write-Host "💡 You may need to delete the solution manually from the Power Platform admin center." -ForegroundColor Yellow
+                }
+            } else {
+                Write-Host "`n📝 Feature solution '$featureSolutionName' has been preserved." -ForegroundColor Cyan
+                Write-Host "💡 You can delete it manually later if needed from the Power Platform admin center." -ForegroundColor Yellow
+            }
         } else {
             Write-Host "Migration cancelled due to missing solutions." -ForegroundColor Yellow
         }
