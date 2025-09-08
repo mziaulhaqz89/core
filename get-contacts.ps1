@@ -1,76 +1,33 @@
-#!/usr/bin/env pwsh
-<#
-.SYNOPSIS
-    Retrieves contacts from Dynamics 365 using Web API with personal credentials
-.DESCRIPTION
-    This script calls the Dynamics 365 Web API to retrieve contacts with firstname and lastname fields.
-    It uses your personal login credentials through MSAL, Azure CLI, or XRM PowerShell modules.
-.EXAMPLE
-    ./get-contacts.ps1
-#>
 
 param()
 
 # Dynamics 365 endpoint
-$D365Endpoint = "https://mzhdev.crm4.dynamics.com/api/data/v9.0/contacts?`$select=firstname,lastname"
+#$D365Endpoint = "https://mzhdev.crm4.dynamics.com/api/data/v9.0/contacts?`$select=firstname,lastname"
+$D365Endpoint = "https://mzhdev.crm4.dynamics.com/api/data/v9.0/msdyn_solutioncomponentsummaries?`$filter=(msdyn_solutionid%20eq%20d792f061-a28c-f011-b4cc-7c1e52362bef)&`$select=msdyn_displayname,msdyn_schemaname,msdyn_componenttype,msdyn_componenttypename&`$orderby=msdyn_componenttype"
 
 function Get-AccessTokenForDataverse {
-    <#
-    .SYNOPSIS
-    Gets access token for Dataverse using personal credentials
-    #>
     try {
-        Write-Host "🔑 Getting access token for Dataverse..." -ForegroundColor Cyan
+        Write-Host "🔑 Getting access token for Dataverse using MSAL..." -ForegroundColor Cyan
         
-        # Method 1: Try using Microsoft.Xrm.Data.PowerShell module
-        Write-Host "Trying Microsoft.Xrm.Data.PowerShell module..." -ForegroundColor Gray
-        try {
-            if (Get-Module -ListAvailable -Name Microsoft.Xrm.Data.PowerShell) {
-                Import-Module Microsoft.Xrm.Data.PowerShell -Force
-                
-                # Connect to Dynamics 365
-                $conn = Connect-CrmOnlineDiscovery -ServerUrl "https://mzhdev.crm4.dynamics.com" -InteractiveMode
-                
-                if ($conn) {
-                    Write-Host "✅ Connected via Microsoft.Xrm.Data.PowerShell" -ForegroundColor Green
-                    # Store connection for later use
-                    $global:CrmConnection = $conn
-                    return "XRM_MODULE_AUTH"
-                }
-            } else {
-                Write-Host "ℹ️  Microsoft.Xrm.Data.PowerShell module not available" -ForegroundColor Gray
-            }
-        }
-        catch {
-            Write-Host "⚠️  XRM module error: $($_.Exception.Message)" -ForegroundColor Yellow
+        if (-not (Get-Module -ListAvailable -Name MSAL.PS)) {
+            throw "MSAL.PS module not available. Please install it with: Install-Module MSAL.PS"
         }
         
-        # Method 2: Try using MSAL (Microsoft Authentication Library)
-        Write-Host "Trying MSAL.PS module..." -ForegroundColor Gray
-        try {
-            if (Get-Module -ListAvailable -Name MSAL.PS) {
-                Import-Module MSAL.PS -Force
-                
-                # Get token using MSAL
-                $clientId = "51f81489-12ee-4a9e-aaae-a2591f45987d" # PowerShell client ID
-                $authority = "https://login.microsoftonline.com/common"
-                $scopes = @("https://mzhdev.crm4.dynamics.com/.default")
-                
-                $token = Get-MsalToken -ClientId $clientId -Authority $authority -Scopes $scopes -Interactive
-                
-                if ($token) {
-                    Write-Host "✅ Access token obtained via MSAL" -ForegroundColor Green
-                    return $token.AccessToken
-                }
-            } else {
-                Write-Host "ℹ️  MSAL.PS module not available" -ForegroundColor Gray
-            }
-        }
-        catch {
-            Write-Host "⚠️  MSAL error: $($_.Exception.Message)" -ForegroundColor Yellow
-        }
+        Import-Module MSAL.PS -Force
         
-        throw "Unable to obtain access token. Please install and authenticate with Azure CLI (az login) or install required PowerShell modules."
+        # Get token using MSAL
+        $clientId = "51f81489-12ee-4a9e-aaae-a2591f45987d" # PowerShell client ID
+        $authority = "https://login.microsoftonline.com/common"
+        $scopes = @("https://mzhdev.crm4.dynamics.com/.default")
+        
+        $token = Get-MsalToken -ClientId $clientId -Authority $authority -Scopes $scopes -Interactive
+        
+        if ($token) {
+            Write-Host "✅ Access token obtained via MSAL" -ForegroundColor Green
+            return $token.AccessToken
+        } else {
+            throw "Failed to obtain access token from MSAL"
+        }
     }
     catch {
         throw "Failed to get access token: $($_.Exception.Message)"
@@ -78,59 +35,22 @@ function Get-AccessTokenForDataverse {
 }
 
 function Invoke-D365WebApi {
-    <#
-    .SYNOPSIS
-    Makes a request to Dynamics 365 Web API
-    #>
     param(
         [string]$Endpoint,
-        [string]$AccessToken = $null
+        [string]$AccessToken
     )
     
     try {
         Write-Host "🌐 Calling Dynamics 365 Web API..." -ForegroundColor Cyan
         Write-Host "Endpoint: $Endpoint" -ForegroundColor Gray
         
-        # If using XRM module connection
-        if ($AccessToken -eq "XRM_MODULE_AUTH" -and $global:CrmConnection) {
-            Write-Host "Using XRM module connection..." -ForegroundColor Gray
-            
-            # Use XRM module to make the call
-            $fetchXml = @"
-<fetch>
-  <entity name="contact">
-    <attribute name="firstname" />
-    <attribute name="lastname" />
-  </entity>
-</fetch>
-"@
-            
-            $result = Get-CrmRecords -conn $global:CrmConnection -EntityLogicalName "contact" -FetchXml $fetchXml
-            
-            # Convert to Web API format
-            $webApiResult = @{
-                value = $result.CrmRecords | ForEach-Object {
-                    @{
-                        firstname = $_.firstname
-                        lastname = $_.lastname
-                    }
-                }
-            }
-            
-            Write-Host "✅ API call successful via XRM module!" -ForegroundColor Green
-            return $webApiResult
-        }
-        
-        # Standard REST API call with bearer token
+        # REST API call with bearer token
         $headers = @{
             "Accept" = "application/json"
             "OData-MaxVersion" = "4.0"
             "OData-Version" = "4.0"
             "Prefer" = "odata.include-annotations=*"
-        }
-        
-        if ($AccessToken -and $AccessToken -ne "XRM_MODULE_AUTH") {
-            $headers["Authorization"] = "Bearer $AccessToken"
+            "Authorization" = "Bearer $AccessToken"
         }
         
         $response = Invoke-RestMethod -Uri $Endpoint -Method Get -Headers $headers
@@ -181,7 +101,7 @@ function Format-ContactsOutput {
 
 # Main script execution
 try {
-    Write-Host "🚀 Starting Dynamics 365 Contacts Retrieval with Personal Credentials..." -ForegroundColor Magenta
+    Write-Host "🚀 Starting Dynamics 365 Contacts Retrieval with MSAL Authentication..." -ForegroundColor Magenta
     Write-Host ""
     
     # Get access token for API calls
@@ -198,9 +118,8 @@ try {
 catch {
     Write-Host "`n❌ Error: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host "`n💡 Troubleshooting tips:" -ForegroundColor Yellow
-    Write-Host "1. Install Azure CLI and run: az login" -ForegroundColor Gray
-    Write-Host "2. Or install MSAL.PS module: Install-Module MSAL.PS" -ForegroundColor Gray
-    Write-Host "3. Or install XRM module: Install-Module Microsoft.Xrm.Data.PowerShell" -ForegroundColor Gray
-    Write-Host "4. Ensure you have access to the Dynamics 365 environment" -ForegroundColor Gray
+    Write-Host "1. Install MSAL.PS module: Install-Module MSAL.PS" -ForegroundColor Gray
+    Write-Host "2. Ensure you have access to the Dynamics 365 environment" -ForegroundColor Gray
+    Write-Host "3. Make sure you can sign in interactively when prompted" -ForegroundColor Gray
     exit 1
 }
