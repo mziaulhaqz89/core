@@ -245,8 +245,8 @@ function Move-ComponentToSolution {
         $pacCommand = ""
         switch ($ComponentType) {
             10112 { 
-                # Connection Reference - use component type name instead of number
-                $pacCommand = "pac solution add-solution-component --solutionUniqueName `"$TargetSolution`" --component `"$componentIdentifier`" --componentType `"Connection Reference`""
+                # Connection Reference - use correct component type name format
+                $pacCommand = "pac solution add-solution-component --solutionUniqueName `"$TargetSolution`" --component `"$componentIdentifier`" --componentType `"ConnectionReference`""
             }
             default {
                 # Standard approach for other component types
@@ -270,7 +270,7 @@ function Move-ComponentToSolution {
             if ($ComponentName -and $ObjectId -and $ComponentName -ne $ObjectId) {
                 Write-Host "🔄 Retrying with ObjectId..." -ForegroundColor Yellow
                 $retryCommand = switch ($ComponentType) {
-                    10112 { "pac solution add-solution-component --solutionUniqueName `"$TargetSolution`" --component `"$ObjectId`" --componentType `"Connection Reference`"" }
+                    10112 { "pac solution add-solution-component --solutionUniqueName `"$TargetSolution`" --component `"$ObjectId`" --componentType `"ConnectionReference`"" }
                     default { "pac solution add-solution-component --solutionUniqueName `"$TargetSolution`" --component `"$ObjectId`" --componentType $ComponentType" }
                 }
                 
