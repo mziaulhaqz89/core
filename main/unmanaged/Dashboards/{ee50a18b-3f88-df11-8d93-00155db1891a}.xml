@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Dashboard unmodified="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <LocalizedNames>
+    <LocalizedName description="Microsoft Dynamics 365 Overview" languagecode="1033" />
+  </LocalizedNames>
+  <Descriptions>
+    <Description description="Shows an overview of your data in Microsoft Dynamics 365." languagecode="1033" />
+  </Descriptions>
+  <FormId>{ee50a18b-3f88-df11-8d93-00155db1891a}</FormId>
+</Dashboard>

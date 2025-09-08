@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ImportExportXml version="9.2.25084.131" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.25084.131" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.25084.00136">
+<ImportExportXml version="9.2.25084.131" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.25084.131" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.25091.00130">
   <SolutionManifest>
     <UniqueName>flows</UniqueName>
     <LocalizedNames>
-      <LocalizedName description="Flows" languagecode="1033" />
+      <LocalizedName description="flows" languagecode="1033" />
     </LocalizedNames>
     <Descriptions />
-    <Version>1.0.0.4</Version>
+    <Version>1.0.0.9</Version>
     <Managed>0</Managed>
     <Publisher>
       <UniqueName>mzh</UniqueName>
@@ -82,6 +82,8 @@
     <RootComponents>
       <RootComponent type="29" id="{1830bda6-358b-f011-b4cb-7c1e5277a969}" behavior="0" />
       <RootComponent type="29" id="{39a52ed1-a589-f011-b4cc-7c1e52362bef}" behavior="0" />
+      <RootComponent type="29" id="{989c0d27-908c-f011-b4cc-7c1e52362bef}" behavior="0" />
+      <RootComponent type="29" id="{dee0e283-908c-f011-b4cc-7c1e5277a969}" behavior="0" />
     </RootComponents>
     <MissingDependencies>
       <MissingDependency>

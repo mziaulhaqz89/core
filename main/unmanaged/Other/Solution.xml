@@ -6,7 +6,7 @@
       <LocalizedName description="main" languagecode="1033" />
     </LocalizedNames>
     <Descriptions />
-    <Version>1.0.0.11</Version>
+    <Version>1.0.0.12</Version>
     <Managed>0</Managed>
     <Publisher>
       <UniqueName>cicdpoc</UniqueName>
@@ -79,12 +79,18 @@
     </Publisher>
     <RootComponents>
       <RootComponent type="1" schemaName="account" behavior="0" />
+      <RootComponent type="1" schemaName="cicd_flowtable1" behavior="0" />
       <RootComponent type="1" schemaName="cicd_housingunit" behavior="0" />
       <RootComponent type="1" schemaName="cicd_lease" behavior="0" />
       <RootComponent type="1" schemaName="cicd_tenant" behavior="0" />
       <RootComponent type="1" schemaName="contact" behavior="0" />
+      <RootComponent type="20" id="{b9b08637-acf6-e711-a95a-000d3a11f5ee}" behavior="0" />
+      <RootComponent type="20" id="{e57bff35-58b4-4725-aee2-40fb18f4c8bd}" behavior="0" />
+      <RootComponent type="60" id="{ee50a18b-3f88-df11-8d93-00155db1891a}" behavior="0" />
       <RootComponent type="62" schemaName="cicd_CoreApp" behavior="0" />
+      <RootComponent type="70" id="{7623b6b1-cdd1-e511-80d2-00155db70850}" behavior="0" />
       <RootComponent type="80" schemaName="cicd_CoreApp" behavior="0" />
+      <RootComponent type="9" schemaName="mzh_destinationtype" behavior="0" />
     </RootComponents>
     <MissingDependencies>
       <MissingDependency>
@@ -102,6 +108,18 @@
       <MissingDependency>
         <Required type="1" schemaName="adx_webformsession" displayName="Multistep Form Session" solution="PowerPages_RuntimeCore (1.0.2402.1)" />
         <Dependent type="1" schemaName="contact" displayName="Contact" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="20" displayName="Approvals User" solution="msdyn_FlowApprovalsCore (2.2.8.0)" id="{b9b08637-acf6-e711-a95a-000d3a11f5ee}">
+          <package appName="msdyn_FlowApprovals" version="2.2.8.0">msdyn_FlowApprovals (2.2.8.0)</package>
+        </Required>
+        <Dependent type="20" displayName="Approvals User" id="{b9b08637-acf6-e711-a95a-000d3a11f5ee}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="20" displayName="AIB Roles" solution="msdyn_AIPrivilegeOverridesSolution (202508.1.0.1)" id="{e57bff35-58b4-4725-aee2-40fb18f4c8bd}">
+          <package appName="PowerAI" version="202508.1.0.1">msdyn_AISolutionAnchor (202508.1.0.1)</package>
+        </Required>
+        <Dependent type="20" displayName="AIB Roles" id="{e57bff35-58b4-4725-aee2-40fb18f4c8bd}" />
       </MissingDependency>
       <MissingDependency>
         <Required type="60" displayName="Contact" parentDisplayName="Contact" solution="msdynce_AppCommon (9.0.4.0066)" id="{1fed44d1-ae68-4a41-bd2b-f13acac4acfa}">
@@ -144,6 +162,10 @@
           <package appName="Base Custom Controls" version="9.0.2508.4007">BaseCustomControlsCore (9.0.2508.4007)</package>
         </Required>
         <Dependent type="60" displayName="Account" parentDisplayName="Account" id="{8448b78f-8f42-454e-8e2a-f8196b0419af}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="70" displayName="Local Identity Credentials" solution="PowerPages_RuntimeCoreExtensions (1.0.2308.2)" id="{7623b6b1-cdd1-e511-80d2-00155db70850}" />
+        <Dependent type="70" displayName="Local Identity Credentials" id="{7623b6b1-cdd1-e511-80d2-00155db70850}" />
       </MissingDependency>
       <MissingDependency>
         <Required type="SettingDefinition" displayName="AppChannel" solution="msdyn_AppFrameworkInfraExtensions (1.0.0.15)" id.uniquename="AppChannel">

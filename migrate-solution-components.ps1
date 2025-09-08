@@ -391,6 +391,9 @@ function Process-ComponentMigration {
         $stats = $migrationResults.ByTarget[$target]
         Write-Host "  $target`: Success=$($stats.Success), Failed=$($stats.Failed)" -ForegroundColor Gray
     }
+    
+    # Return affected solutions for export prompt
+    return $migrationResults
 }
 
 # Main script execution
@@ -524,7 +527,90 @@ try {
         
         if ($shouldContinue) {
             # Process component migration
-            Process-ComponentMigration -ComponentsData $componentsData
+            $migrationResults = Process-ComponentMigration -ComponentsData $componentsData
+            
+            # Show affected/updated solutions summary
+            Write-Host "`n🎯 Affected Target Solutions Summary:" -ForegroundColor Magenta
+            Write-Host "====================================" -ForegroundColor Magenta
+            
+            $affectedSolutions = @()
+            if ($migrationResults.ByTarget -and $migrationResults.ByTarget.Keys.Count -gt 0) {
+                Write-Host "The following target solutions have been updated with new components:" -ForegroundColor Cyan
+                Write-Host ""
+                
+                foreach ($solutionName in ($migrationResults.ByTarget.Keys | Sort-Object)) {
+                    $stats = $migrationResults.ByTarget[$solutionName]
+                    if ($stats.Success -gt 0) {
+                        $affectedSolutions += $solutionName
+                        Write-Host "  ✅ " -ForegroundColor Green -NoNewline
+                        Write-Host "$solutionName".PadRight(20) -ForegroundColor White -NoNewline
+                        Write-Host " → " -ForegroundColor Gray -NoNewline
+                        Write-Host "$($stats.Success) components added" -ForegroundColor Green
+                    }
+                }
+                
+                if ($affectedSolutions.Count -eq 0) {
+                    Write-Host "  ⚠️  No target solutions were successfully updated." -ForegroundColor Yellow
+                }
+            } else {
+                Write-Host "  ⚠️  No target solutions were affected." -ForegroundColor Yellow
+            }
+            
+            # Ask user if they want to export affected solutions
+            if ($affectedSolutions.Count -gt 0) {
+                Write-Host "`n📦 Solution Export:" -ForegroundColor Magenta
+                Write-Host "==================" -ForegroundColor Magenta
+                Write-Host "The affected target solutions can now be exported to capture the new changes." -ForegroundColor Cyan
+                Write-Host "This will version and export each solution using the export-solution.ps1 script." -ForegroundColor Cyan
+                Write-Host ""
+                Write-Host "Affected solutions to export:" -ForegroundColor Yellow
+                foreach ($solution in $affectedSolutions) {
+                    Write-Host "  📁 $solution" -ForegroundColor White
+                }
+                Write-Host ""
+                Write-Host "❓ Do you want to export the affected solutions now? (Y/N): " -ForegroundColor Yellow -NoNewline
+                $exportResponse = Read-Host
+                
+                if ($exportResponse -eq 'Y' -or $exportResponse -eq 'y') {
+                    Write-Host "`n🚀 Starting solution export process..." -ForegroundColor Cyan
+                    
+                    foreach ($solutionName in $affectedSolutions) {
+                        try {
+                            Write-Host "`n📦 Exporting solution: $solutionName" -ForegroundColor Magenta
+                            Write-Host "═══════════════════════════════════════" -ForegroundColor Magenta
+                            
+                            # Check if export-solution.ps1 exists
+                            $exportScriptPath = "./export-solution.ps1"
+                            if (-not (Test-Path $exportScriptPath)) {
+                                Write-Host "❌ Export script not found at: $exportScriptPath" -ForegroundColor Red
+                                Write-Host "💡 Please ensure export-solution.ps1 is in the current directory." -ForegroundColor Yellow
+                                continue
+                            }
+                            
+                            # Execute the export script for this solution
+                            $exportCommand = "pwsh `"$exportScriptPath`" -SolutionName `"$solutionName`" -VersionType `"patch`""
+                            Write-Host "Executing: $exportCommand" -ForegroundColor Gray
+                            
+                            $exportResult = Invoke-Expression $exportCommand 2>&1
+                            
+                            if ($LASTEXITCODE -eq 0) {
+                                Write-Host "✅ Successfully exported solution: $solutionName" -ForegroundColor Green
+                            } else {
+                                Write-Host "❌ Failed to export solution: $solutionName" -ForegroundColor Red
+                                Write-Host "Error output: $exportResult" -ForegroundColor Red
+                            }
+                        }
+                        catch {
+                            Write-Host "❌ Exception while exporting solution '$solutionName': $($_.Exception.Message)" -ForegroundColor Red
+                        }
+                    }
+                    
+                    Write-Host "`n🎉 Solution export process completed!" -ForegroundColor Green
+                } else {
+                    Write-Host "`n📝 Solution export skipped." -ForegroundColor Cyan
+                    Write-Host "💡 You can export solutions later using: ./export-solution.ps1 -SolutionName <SolutionName>" -ForegroundColor Yellow
+                }
+            }
             
             # Ask user if they want to delete the feature solution
             Write-Host "`n🗑️  Feature Solution Cleanup:" -ForegroundColor Magenta

@@ -6,7 +6,7 @@
       <LocalizedName description="webresources" languagecode="1033" />
     </LocalizedNames>
     <Descriptions />
-    <Version>1.0.0.3</Version>
+    <Version>1.0.0.4</Version>
     <Managed>0</Managed>
     <Publisher>
       <UniqueName>cicdpoc</UniqueName>
@@ -78,9 +78,18 @@
       </Addresses>
     </Publisher>
     <RootComponents>
+      <RootComponent type="61" schemaName="Administration.svg" behavior="0" />
       <RootComponent type="61" schemaName="cicd_contactform" behavior="0" />
+      <RootComponent type="61" schemaName="cicd_leaseform" behavior="0" />
       <RootComponent type="61" schemaName="cicd_mzh_accountform" behavior="0" />
     </RootComponents>
-    <MissingDependencies />
+    <MissingDependencies>
+      <MissingDependency>
+        <Required type="61" schemaName="Administration.svg" displayName="Administration.svg" solution="PowerPlatformEnvironmentSettings (1.1.1.2116)">
+          <package appName="PowerPlatformEnvironmentSettingsApp" version="1.1.1.2116">PowerPlatformEnvironmentSettingsApp_Anchor (1.1.1.2116)</package>
+        </Required>
+        <Dependent type="61" schemaName="Administration.svg" displayName="Administration.svg" />
+      </MissingDependency>
+    </MissingDependencies>
   </SolutionManifest>
 </ImportExportXml>

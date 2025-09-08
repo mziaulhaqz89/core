@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FieldSecurityProfiles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <FieldSecurityProfile name="Local Identity Credentials" description="Limits access to local identity credential fields to system administrators." fieldsecurityprofileid="{7623b6b1-cdd1-e511-80d2-00155db70850}" unmodified="1" />
+</FieldSecurityProfiles>
