@@ -89,11 +89,15 @@ When your feature is ready, use the **Component Migration Script** to automatica
 1. **🔐 Authentication**: Interactive Azure AD login using MSAL.PS
 2. **📋 Component Discovery**: Retrieves all components from your feature solution
 3. **🎯 Smart Distribution**: Automatically maps components to target solutions:
-   - **Entities** → `main` solution
-   - **Processes/Flows** → `flows` solution  
-   - **Web Resources** → `webresources` solution
-   - **Connection References** → `connectionreference` solution
-   - **Plugins/SDK Messages** → `plugins` solution
+
+   | Component Type | Component ID | Target Solution | Description |
+   |---|---|---|---|
+   | 🏢 **Entities** | `1` | `main` | Tables, custom entities, and data models |
+   | 🔄 **Processes/Flows** | `29` | `flows` | Power Automate workflows and business processes |
+   | 🎨 **Web Resources** | `61` | `webresources` | JavaScript, CSS, HTML files, and form customizations |
+   | 🔗 **Connection References** | `10112` | `connectionreference` | External system connections and API integrations |
+   | ⚙️ **Plugin Assemblies** | `91` | `plugins` | Custom .NET assemblies and server-side logic |
+   | 📨 **SDK Messages** | `92` | `plugins` | Custom API messages and event handlers |
 
 4. **📊 Beautiful Display**: Shows migration mapping in formatted tables
 5. **✅ Automated Migration**: Uses PAC CLI to migrate components
