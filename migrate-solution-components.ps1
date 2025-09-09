@@ -1,30 +1,6 @@
 
 param()
 
-<#
-.SYNOPSIS
-    Dynamics 365 Solution Component Migration Script
-
-.DESCRIPTION
-    This script retrieves solution components from a Dynamics 365 environment and 
-    automatically migrates them to appropriate target solutions based on component type:
-    
-    - Component Type 1 (Entity) -> main solution
-    - Component Type 10112 (Connection Reference) -> connectionreference solution  
-    - Component Type 29 (Process/Flow) -> flows solution
-    - Component Type 61 (Web Resource) -> webresources solution
-    - Component Type 91,92 (Plugin Assembly/SDK Message) -> plugins solution
-
-.REQUIREMENTS
-    - MSAL.PS PowerShell module
-    - Microsoft Power Platform CLI (PAC)
-    - Access to Dynamics 365 environment
-    - Target solutions must exist in the environment
-
-.AUTHOR
-    Generated for solution component management
-#>
-
 # Dynamics 365 base endpoint
 $D365BaseEndpoint = "https://mzhdev.crm4.dynamics.com/api/data/v9.0"
 
@@ -595,7 +571,7 @@ try {
                     Write-Host "`n🎉 Solution export process completed!" -ForegroundColor Green
                 } else {
                     Write-Host "`n📝 Solution export skipped." -ForegroundColor Cyan
-                    Write-Host "💡 You can export solutions later using: ./export-solution.ps1 -SolutionName <SolutionName>" -ForegroundColor Yellow
+                    Write-Host "💡 You can export solutions later using: ./export-solution.ps1 -SolutionName `"YourSolutionName`"" -ForegroundColor Yellow
                 }
             }
             
