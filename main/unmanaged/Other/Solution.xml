@@ -6,7 +6,7 @@
       <LocalizedName description="main" languagecode="1033" />
     </LocalizedNames>
     <Descriptions />
-    <Version>1.0.0.12</Version>
+    <Version>1.0.0.14</Version>
     <Managed>0</Managed>
     <Publisher>
       <UniqueName>cicdpoc</UniqueName>
@@ -79,15 +79,20 @@
     </Publisher>
     <RootComponents>
       <RootComponent type="1" schemaName="account" behavior="0" />
+      <RootComponent type="1" schemaName="cicd_country" behavior="0" />
       <RootComponent type="1" schemaName="cicd_flowtable1" behavior="0" />
       <RootComponent type="1" schemaName="cicd_housingunit" behavior="0" />
       <RootComponent type="1" schemaName="cicd_lease" behavior="0" />
+      <RootComponent type="1" schemaName="cicd_place" behavior="0" />
       <RootComponent type="1" schemaName="cicd_tenant" behavior="0" />
+      <RootComponent type="1" schemaName="cicd_testtablemigration" behavior="0" />
       <RootComponent type="1" schemaName="contact" behavior="0" />
+      <RootComponent type="20" id="{3f199ebd-977e-43e5-abe5-fe865a1f2904}" behavior="0" />
       <RootComponent type="20" id="{b9b08637-acf6-e711-a95a-000d3a11f5ee}" behavior="0" />
       <RootComponent type="20" id="{e57bff35-58b4-4725-aee2-40fb18f4c8bd}" behavior="0" />
       <RootComponent type="60" id="{ee50a18b-3f88-df11-8d93-00155db1891a}" behavior="0" />
       <RootComponent type="62" schemaName="cicd_CoreApp" behavior="0" />
+      <RootComponent type="62" schemaName="cicd_PlacesApp" behavior="0" />
       <RootComponent type="70" id="{7623b6b1-cdd1-e511-80d2-00155db70850}" behavior="0" />
       <RootComponent type="80" schemaName="cicd_CoreApp" behavior="0" />
       <RootComponent type="9" schemaName="mzh_destinationtype" behavior="0" />
@@ -108,6 +113,12 @@
       <MissingDependency>
         <Required type="1" schemaName="adx_webformsession" displayName="Multistep Form Session" solution="PowerPages_RuntimeCore (1.0.2402.1)" />
         <Dependent type="1" schemaName="contact" displayName="Contact" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="20" displayName="AIB SML Roles" solution="msdyn_AIPrivilegeOverridesSolution (202508.1.0.1)" id="{3f199ebd-977e-43e5-abe5-fe865a1f2904}">
+          <package appName="PowerAI" version="202508.1.0.1">msdyn_AISolutionAnchor (202508.1.0.1)</package>
+        </Required>
+        <Dependent type="20" displayName="AIB SML Roles" id="{3f199ebd-977e-43e5-abe5-fe865a1f2904}" />
       </MissingDependency>
       <MissingDependency>
         <Required type="20" displayName="Approvals User" solution="msdyn_FlowApprovalsCore (2.2.8.0)" id="{b9b08637-acf6-e711-a95a-000d3a11f5ee}">
