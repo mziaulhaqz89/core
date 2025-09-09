@@ -6,20 +6,7 @@ param()
     Dynamics 365 Solution Component Migration Script
 
 .DESCRIPTION
-    This script retrieve        # Display components in a formatted table
-        $ComponentsData.value | ForEach-Object {
-            $displayName = if ($_.msdyn_displayname) { $_.msdyn_displayname } else { "(No display name)" }
-            $schemaName = if ($_.msdyn_schemaname) { $_.msdyn_schemaname } else { "(No schema name)" }
-            $componentType = $_.msdyn_componenttype
-            $componentTypeName = if ($_.msdyn_componenttypename) { $_.msdyn_componenttypename } else { "(No type name)" }
-            $objectId = if ($_.msdyn_objectid) { $_.msdyn_objectid } else { "(No object ID)" }
-            
-            Write-Host "🔧 $displayName" -ForegroundColor White
-            Write-Host "   Schema: $schemaName" -ForegroundColor Gray
-            Write-Host "   Object ID: $objectId" -ForegroundColor Gray
-            Write-Host "   Type: $componentType ($componentTypeName)" -ForegroundColor Gray
-            Write-Host ""
-        }ution components from a Dynamics 365 environment and 
+    This script retrieves solution components from a Dynamics 365 environment and 
     automatically migrates them to appropriate target solutions based on component type:
     
     - Component Type 1 (Entity) -> main solution
