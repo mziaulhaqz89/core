@@ -1,0 +1,103 @@
+name: Migrate Solution Components
+
+on:
+  workflow_dispatch:
+    inputs:
+      feature_solution_name:
+        description: 'Feature solution unique name (e.g., FeatureSolution1)'
+        required: true
+        type: string
+      proceed_with_migration:
+        description: 'Proceed with component migration?'
+        required: true
+        type: boolean
+        default: false
+      export_affected_solutions:
+        description: 'Export affected solutions after migration?'
+        required: true
+        type: boolean
+        default: false
+      delete_feature_solution:
+        description: 'Delete the feature solution after migration?'
+        required: true
+        type: boolean
+        default: false
+      dataverse_environment_url:
+        description: 'Dataverse environment URL (e.g., https://yourorg.crm4.dynamics.com)'
+        required: true
+        type: string
+        default: 'https://mzhdev.crm4.dynamics.com'
+
+env:
+  FORCE_COLOR: 3
+
+jobs:
+  migrate-components:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup PowerShell modules
+      shell: pwsh
+      run: |
+        Write-Host "Installing required PowerShell modules..." -ForegroundColor Cyan
+        Install-Module -Name MSAL.PS -Force -AllowClobber -Scope CurrentUser
+        Write-Host "✅ MSAL.PS module installed" -ForegroundColor Green
+    
+    - name: Setup Power Platform CLI
+      uses: microsoft/powerplatform-actions/actions-install@v1
+    
+    - name: Authenticate to Power Platform
+      shell: pwsh
+      run: |
+        Write-Host "🔑 Authenticating to Power Platform..." -ForegroundColor Cyan
+        
+        # Use service principal authentication for GitHub Actions
+        # Note: TENANT_ID and CLIENT_ID are environment variables, CLIENT_SECRET is a secret
+        if ($env:TENANT_ID -and $env:CLIENT_ID -and $env:CLIENT_SECRET) {
+          Write-Host "Using service principal authentication..." -ForegroundColor Yellow
+          pac auth create --url "${{ inputs.dataverse_environment_url }}" --tenant "$env:TENANT_ID" --applicationId "$env:CLIENT_ID" --clientSecret "$env:CLIENT_SECRET"
+        } else {
+          Write-Host "⚠️ Service principal credentials not found. This will require manual authentication." -ForegroundColor Yellow
+          Write-Host "Please set up TENANT_ID and CLIENT_ID as environment variables, and CLIENT_SECRET as a secret." -ForegroundColor Yellow
+          exit 1
+        }
+      env:
+        TENANT_ID: ${{ vars.TENANT_ID }}
+        CLIENT_ID: ${{ vars.CLIENT_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+    
+    - name: Run Migration Script
+      shell: pwsh
+      run: |
+        Write-Host "🚀 Starting Dynamics 365 Solution Component Migration..." -ForegroundColor Magenta
+        
+        # Set parameters from workflow inputs
+        $featureSolutionName = "${{ inputs.feature_solution_name }}"
+        $proceedWithMigration = [System.Convert]::ToBoolean("${{ inputs.proceed_with_migration }}")
+        $exportAffectedSolutions = [System.Convert]::ToBoolean("${{ inputs.export_affected_solutions }}")
+        $deleteFeatureSolution = [System.Convert]::ToBoolean("${{ inputs.delete_feature_solution }}")
+        $dataverseUrl = "${{ inputs.dataverse_environment_url }}"
+        
+        Write-Host "📋 Workflow Parameters:" -ForegroundColor Cyan
+        Write-Host "  Feature Solution: $featureSolutionName" -ForegroundColor White
+        Write-Host "  Proceed with Migration: $proceedWithMigration" -ForegroundColor White
+        Write-Host "  Export Solutions: $exportAffectedSolutions" -ForegroundColor White
+        Write-Host "  Delete Feature Solution: $deleteFeatureSolution" -ForegroundColor White
+        Write-Host "  Environment URL: $dataverseUrl" -ForegroundColor White
+        Write-Host ""
+        
+        # Execute the migration script with parameters
+        ./migrate-solution-components-github.ps1 -FeatureSolutionName $featureSolutionName -ProceedWithMigration $proceedWithMigration -ExportAffectedSolutions $exportAffectedSolutions -DeleteFeatureSolution $deleteFeatureSolution -DataverseUrl $dataverseUrl
+    
+    - name: Upload logs as artifact
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: migration-logs-${{ github.run_number }}
+        path: |
+          *.log
+          migration-results.json
+        retention-days: 30

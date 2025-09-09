@@ -1,185 +1,207 @@
-# Core Power Platform Solution - GitHub Actions
+# GitHub Action: Migrate Solution Components
 
-This repository contains automated CI/CD workflows for the **main** Power Platform solution using GitHub Actions.
+This GitHub Action allows you to run the solution component migration process manually through GitHub's web interface, eliminating the need for interactive prompts while maintaining full control over the migration process.
 
-## 🎯 What This Repository Does
+## 🚀 Features
 
-✅ **Export Solutions**: Automated export from DEV environment with custom branch naming  
-✅ **Quality Gates**: Solution checker validation at every deployment stage  
-✅ **Deployment Pipeline**: Automated TEST → UAT → PRODUCTION deployment with approval gates  
-✅ **Version Management**: Automated version increments using semantic versioning  
-✅ **Artifact Management**: Solution artifacts with retention
+- **Manual Workflow Dispatch**: Run the migration on-demand through GitHub UI
+- **Parameterized Inputs**: All interactive prompts converted to workflow inputs
+- **Service Principal Authentication**: Secure, non-interactive authentication
+- **Comprehensive Logging**: Detailed logs and artifacts for troubleshooting
+- **Component Migration**: Automatically moves components to appropriate target solutions
+- **Solution Export**: Optionally export affected solutions after migration
+- **Feature Solution Cleanup**: Optionally delete the source feature solution
 
-## 🚀 Quick Start
+## 📋 Prerequisites
 
-### 1. Configure Secrets & Variables
+### 1. Repository Secrets and Variables Setup
 
-**Required Repository Secrets** (Settings → Secrets and variables → Actions):
-```
-PowerPlatformSPN = your-service-principal-secret
-```
+You need to configure secrets and variables in your GitHub repository:
 
-**Repository Variables** (Settings → Secrets and variables → Actions → Variables):
-```
-DEV_ENVIRONMENT_URL = https://mzhdev.crm4.dynamics.com
-TEST_ENVIRONMENT_URL = https://mzhtest.crm4.dynamics.com  
-UAT_ENVIRONMENT_URL = https://mzhuat.crm4.dynamics.com
-PRODUCTION_ENVIRONMENT_URL = https://mzhprod.crm11.dynamics.com
-CLIENT_ID = c07145b8-e4f8-48ad-8a7c-9fe5d3827e52
-TENANT_ID = d7d483b3-60d3-4211-a15e-9c2a090d2136
-```
+1. Go to your repository → Settings → Secrets and variables → Actions
 
-**GitHub Environments** (Settings → Environments):
-```
-TEST = Testing environment with approval gates
-UAT = User Acceptance Testing environment  
-PRODUCTION = Production environment with approval gates
-```
+2. Add the following **Repository Variables** (Variables tab):
 
-### 2. Solution Structure
+| Variable Name | Description | Example |
+|---------------|-------------|---------|
+| `TENANT_ID` | Your Azure AD Tenant ID | `12345678-1234-1234-1234-123456789012` |
+| `CLIENT_ID` | Service Principal Application ID | `87654321-4321-4321-4321-210987654321` |
 
-This repository manages the **main** solution containing:
-- **HousingUnit** (`cicd_housingunit`) - Housing unit management
-- **Lease** (`cicd_lease`) - Lease agreements and contracts  
-- **Tenant** (`cicd_tenant`) - Tenant information and details
+3. Add the following **Repository Secret** (Secrets tab):
 
-## 📋 Available Workflows
+| Secret Name | Description | Example |
+|-------------|-------------|---------|
+| `CLIENT_SECRET` | Service Principal Secret | `your-service-principal-secret` |
 
-### 1. 🔄 Export Main Solution From Dev
-**File**: `01-export-main-solution.yml`  
-**Purpose**: Export main solution from DEV environment and create PR
+### 2. Service Principal Setup
 
-**Features**:
-- Automated export of main solution (unmanaged)
-- Optional managed solution export
-- Custom branch naming or auto-generated timestamps
-- Automatic PR creation with detailed summary
-
-**Usage**:
-1. Actions → "Export Main Solution From Dev" → Run workflow
-2. Choose solution options (managed/unmanaged)
-3. Optionally provide custom branch name
-4. Creates PR with solution changes
-
-### 2. 🚢 Deploy Main Solution  
-**File**: `02-deploy-main-solution.yml`  
-**Purpose**: Deploy main solution through all environments
-
-**Triggers**:
-- **Push to `main`** when `mainsolution/**` changes (automatic)
-- Manual workflow dispatch
-
-**Deployment Flow**:
-1. **Pack Solution**: Creates managed solution from source
-2. **Deploy to TEST**: Automatic deployment to test environment
-3. **Deploy to UAT**: Deployment with approval gate
-4. **Deploy to PRODUCTION**: Final deployment with approval gate
-
-### 3. 🏗️ Shared Deployment Pipeline
-**File**: `shared-deployment-pipeline.yml`  
-**Purpose**: Reusable deployment workflow with intelligent import logic
-
-**Features**:
-- Smart solution existence checking
-- Intelligent import mode selection (update vs upgrade)
-- Environment-specific deployment strategies
-- Comprehensive error handling and logging
-
-## 🔧 PowerShell Export Script
-
-The repository includes `export-solution.ps1` for local development:
+Create a service principal with appropriate permissions:
 
 ```powershell
-# Basic usage (patch increment)
-pwsh ./export-solution.ps1
+# Connect to Azure
+Connect-AzAccount
 
-# Minor version increment  
-pwsh ./export-solution.ps1 -VersionType "minor"
+# Create service principal
+$sp = New-AzADServicePrincipal -DisplayName "GitHub-Actions-PowerPlatform" -Role "Contributor"
 
-# Major version increment
-pwsh ./export-solution.ps1 -VersionType "major"
+# Output the required values
+Write-Host "TENANT_ID: $(Get-AzContext).Tenant.Id"
+Write-Host "CLIENT_ID: $($sp.ApplicationId)"
+Write-Host "CLIENT_SECRET: $($sp.Secret | ConvertFrom-SecureString -AsPlainText)"
 ```
 
-**Script Features**:
-- Automatic version checking and incrementing
-- Exports both managed and unmanaged solutions  
-- Unpacks solutions for source control
-- Colored output with progress indicators
+### 3. Power Platform Permissions
 
-## 🎛️ Environment Setup
+Ensure your service principal has the following permissions in your Power Platform environment:
 
-### GitHub Environments Configuration
+- **System Administrator** role in Dataverse
+- **Environment Maker** role in Power Platform
+- Access to modify solutions and components
 
-1. **TEST Environment**
-   - **Variables**: `TEST_ENVIRONMENT_URL`
-   - **Protection**: Optional approval gates
+## 🎯 Target Solutions Required
 
-2. **UAT Environment**  
-   - **Variables**: `UAT_ENVIRONMENT_URL`
-   - **Protection**: Approval gates recommended
-   
-3. **PRODUCTION Environment**
-   - **Variables**: `PRODUCTION_ENVIRONMENT_URL`
-   - **Protection**: Approval gates required
+The migration process expects these target solutions to exist in your environment:
 
-### Service Principal Setup
+- `main` - For general components (entities, forms, views, etc.)
+- `connectionreference` - For connection references
+- `flows` - For Power Automate flows
+- `webresources` - For web resources
+- `plugins` - For plugin assemblies and steps
 
-1. **Azure AD App Registration**: Create app registration for GitHub Actions
-2. **Configure Permissions**: Add Dynamics CRM user_impersonation permission  
-3. **Create Secret**: Generate client secret and add to GitHub secrets
-4. **Power Platform Access**: Add app user to all environments with System Administrator role
+## 🔧 How to Use
 
-## 🔍 Development Workflow
+### 1. Navigate to Actions Tab
 
-### Export Process:
-1. **Make Changes**: Develop in Power Platform DEV environment
-2. **Export**: Run "Export Main Solution From Dev" workflow
-3. **Review**: Review PR changes and validate solution components
-4. **Merge**: Merge PR to trigger automatic deployment
+1. Go to your repository on GitHub
+2. Click on the **Actions** tab
+3. Find "Migrate Solution Components" workflow
+4. Click **Run workflow**
 
-### Deployment Process:
-1. **Automatic Trigger**: Deployment starts when PR is merged to main
-2. **Pack Solution**: Creates managed solution package
-3. **Deploy to TEST**: Automatic deployment for testing
-4. **Deploy to UAT**: Manual approval required
-5. **Deploy to PRODUCTION**: Final manual approval required
+### 2. Fill in Parameters
 
-## 🚨 Troubleshooting
+The workflow will prompt you for the following inputs:
 
-### Common Issues:
+| Parameter | Description | Required | Default |
+|-----------|-------------|----------|---------|
+| **Feature Solution Name** | Unique name of the source solution | ✅ | - |
+| **Proceed with Migration** | Actually perform the migration | ✅ | `false` |
+| **Export Affected Solutions** | Export target solutions after migration | ✅ | `false` |
+| **Delete Feature Solution** | Delete source solution after migration | ✅ | `false` |
+| **Dataverse Environment URL** | Your Dataverse environment URL | ✅ | `https://mzhdev.crm4.dynamics.com` |
 
-#### 🔐 Authentication Failed
-- Verify PowerPlatformSPN secret is correct
-- Check service principal has access to all environments
-- Validate CLIENT_ID and TENANT_ID variables
+### 3. Example Usage
 
-#### 🏗️ Solution Export Failed  
-- Ensure solution "main" exists in DEV environment
-- Check solution name spelling (case-sensitive)
-- Verify no concurrent edits in Power Platform
+**Scenario 1: Preview Migration (Safe)**
+- Feature Solution Name: `MyFeatureSolution`
+- Proceed with Migration: `false`
+- Export Affected Solutions: `false`
+- Delete Feature Solution: `false`
 
-#### ⏸️ Approval Gate Issues
-- Ensure GitHub environments are configured
-- Verify required reviewers are assigned
-- Check reviewers have repository access
+**Scenario 2: Full Migration with Export**
+- Feature Solution Name: `MyFeatureSolution`
+- Proceed with Migration: `true`
+- Export Affected Solutions: `true`
+- Delete Feature Solution: `false`
 
-## 🎯 Best Practices
+**Scenario 3: Complete Migration with Cleanup**
+- Feature Solution Name: `MyFeatureSolution`
+- Proceed with Migration: `true`
+- Export Affected Solutions: `true`
+- Delete Feature Solution: `true`
 
-### Development:
-- Test changes in DEV environment before export
-- Use meaningful commit messages
-- Review solution components before merging PRs
+## 📊 Component Type Mapping
 
-### Deployment:
-- Schedule PRODUCTION deployments during maintenance windows
-- Test in UAT before PRODUCTION approval
-- Document significant changes in PR descriptions
+The action automatically maps components to target solutions:
 
-### Security:
-- Regularly rotate service principal secrets
-- Use least privilege access principles
-- Monitor workflow runs for suspicious activity
+| Component Type ID | Component Type | Target Solution |
+|-------------------|----------------|-----------------|
+| 10112 | Connection Reference | `connectionreference` |
+| 29 | Process/Flow | `flows` |
+| 61 | Web Resource | `webresources` |
+| 91 | Plugin Assembly | `plugins` |
+| 92 | SDK Message Processing Step | `plugins` |
+| Others | All Other Types | `main` |
 
----
+## 📁 Artifacts and Logs
 
-🎉 **Your Power Platform solution is now ready for automated CI/CD!**
+After each run, the action provides downloadable artifacts:
+
+- **Migration Logs**: Detailed execution logs with timestamps
+- **Component Summary**: JSON file with all discovered components
+- **Migration Results**: JSON file with migration statistics
+
+## 🔍 Monitoring the Run
+
+1. **Real-time Logs**: Watch the action execution in real-time
+2. **Step-by-Step Progress**: Each step shows detailed progress
+3. **Error Handling**: Clear error messages and troubleshooting tips
+4. **Summary Reports**: Component counts and migration statistics
+
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+1. **Authentication Failures**
+   - Verify CLIENT_SECRET is correctly set in GitHub secrets
+   - Verify TENANT_ID and CLIENT_ID are correctly set in GitHub variables
+   - Ensure service principal has proper Power Platform permissions
+   - Check tenant ID is correct
+
+2. **Missing Target Solutions**
+   - Create required target solutions in your environment
+   - Verify solution names match exactly (case-sensitive)
+
+3. **PAC CLI Issues**
+   - The action automatically installs PAC CLI
+   - Ensure your environment is accessible from GitHub runners
+
+4. **Component Migration Failures**
+   - Check component dependencies
+   - Verify component isn't already in target solution
+   - Review detailed logs in the action output
+
+### Debug Mode
+
+To enable additional debugging:
+
+1. Go to repository Settings → Secrets and variables → Actions
+2. Add a **Repository Variable** named `ACTIONS_RUNNER_DEBUG` with value `true`
+3. Re-run the workflow for detailed debug logs
+
+## 🔄 Local Testing
+
+You can test the GitHub-specific script locally:
+
+```powershell
+# Test the GitHub Actions version locally
+./migrate-solution-components-github.ps1 `
+    -FeatureSolutionName "MyFeatureSolution" `
+    -ProceedWithMigration $true `
+    -ExportAffectedSolutions $false `
+    -DeleteFeatureSolution $false `
+    -DataverseUrl "https://yourorg.crm4.dynamics.com"
+```
+
+## 📝 Best Practices
+
+1. **Always Preview First**: Run with `ProceedWithMigration: false` to see what will be migrated
+2. **Test in Development**: Use a development environment before production
+3. **Backup Solutions**: Export solutions before major migrations
+4. **Incremental Migration**: Process smaller batches of components when possible
+5. **Monitor Dependencies**: Check for component dependencies before migration
+
+## 🔗 Related Files
+
+- `migrate-solution-components.ps1` - Original interactive script
+- `migrate-solution-components-github.ps1` - GitHub Actions version
+- `export-solution.ps1` - Solution export script (called automatically)
+- `.github/workflows/migrate-solution-components.yml` - GitHub Action workflow
+
+## 📞 Support
+
+If you encounter issues:
+
+1. Check the action logs and artifacts
+2. Review the troubleshooting section
+3. Verify all prerequisites are met
+4. Test the process in a development environment first
