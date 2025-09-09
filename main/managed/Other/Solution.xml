@@ -6,7 +6,7 @@
       <LocalizedName description="main" languagecode="1033" />
     </LocalizedNames>
     <Descriptions />
-    <Version>1.0.0.14</Version>
+    <Version>1.0.0.15</Version>
     <Managed>1</Managed>
     <Publisher>
       <UniqueName>cicdpoc</UniqueName>
@@ -87,6 +87,7 @@
       <RootComponent type="1" schemaName="cicd_tenant" behavior="0" />
       <RootComponent type="1" schemaName="cicd_testtablemigration" behavior="0" />
       <RootComponent type="1" schemaName="contact" behavior="0" />
+      <RootComponent type="1" schemaName="email" behavior="0" />
       <RootComponent type="20" id="{3f199ebd-977e-43e5-abe5-fe865a1f2904}" behavior="0" />
       <RootComponent type="20" id="{b9b08637-acf6-e711-a95a-000d3a11f5ee}" behavior="0" />
       <RootComponent type="20" id="{e57bff35-58b4-4725-aee2-40fb18f4c8bd}" behavior="0" />
@@ -113,6 +114,13 @@
       <MissingDependency>
         <Required type="1" schemaName="adx_webformsession" displayName="Multistep Form Session" solution="PowerPages_RuntimeCore (1.0.2402.1)" />
         <Dependent type="1" schemaName="contact" displayName="Contact" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="acceptingentityid" displayName="Accepting Entity" parentSchemaName="email" parentDisplayName="Email" solution="msft_ActivitiesInfra_Extensions (9.2.0.73)">
+          <package appName="msdynce_Activities" version="9.0.25084.250826007">msdynce_EnableUCIByDefault (9.0.25084.250826007)</package>
+          <package appName="ActivitiesInfra Package" version="1.0.0.0">msft_ActivitiesInfra_Anchor (1.0.0.0)</package>
+        </Required>
+        <Dependent type="2" schemaName="acceptingentityid" displayName="Accepting Entity" parentSchemaName="email" parentDisplayName="Email" />
       </MissingDependency>
       <MissingDependency>
         <Required type="20" displayName="AIB SML Roles" solution="msdyn_AIPrivilegeOverridesSolution (202508.1.0.1)" id="{3f199ebd-977e-43e5-abe5-fe865a1f2904}">

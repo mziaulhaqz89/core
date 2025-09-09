@@ -12,6 +12,10 @@
   <EntityRelationship Name="cicd_Lease_cicd_HousingUnit" />
   <EntityRelationship Name="cicd_Lease_cicd_Tenant" />
   <EntityRelationship Name="cicd_Place_cicd_Country" />
+  <EntityRelationship Name="email_acceptingentity_queue" />
+  <EntityRelationship Name="email_acceptingentity_systemuser" />
+  <EntityRelationship Name="email_email_CorrelatedActivityId" />
+  <EntityRelationship Name="FileAttachment_Email_DescriptionBlobId" />
   <EntityRelationship Name="lk_cicd_country_createdby" />
   <EntityRelationship Name="lk_cicd_country_modifiedby" />
   <EntityRelationship Name="lk_cicd_flowtable1_createdby" />
@@ -26,6 +30,7 @@
   <EntityRelationship Name="lk_cicd_tenant_modifiedby" />
   <EntityRelationship Name="lk_cicd_testtablemigration_createdby" />
   <EntityRelationship Name="lk_cicd_testtablemigration_modifiedby" />
+  <EntityRelationship Name="mailbox_email_ReceivingMailboxId" />
   <EntityRelationship Name="msa_account_managingpartner" />
   <EntityRelationship Name="msa_contact_managingpartner" />
   <EntityRelationship Name="owner_cicd_country" />
@@ -37,6 +42,7 @@
   <EntityRelationship Name="owner_cicd_testtablemigration" />
   <EntityRelationship Name="powerpagecomponent_mspp_webrole_account" />
   <EntityRelationship Name="powerpagecomponent_mspp_webrole_contact" />
+  <EntityRelationship Name="sensitivitylabel_email_SensitivityLabelId" />
   <EntityRelationship Name="team_cicd_country" />
   <EntityRelationship Name="team_cicd_flowtable1" />
   <EntityRelationship Name="team_cicd_housingunit" />
