@@ -103,20 +103,66 @@ function Format-ComponentsOutput {
     .SYNOPSIS
     Formats and displays the solution components data
     #>
-    param($ComponentsData)
+    param(
+        $ComponentsData,
+        [bool]$UseRootComponentsOnly = $false,
+        [bool]$UseInteractiveSelection = $false
+    )
     
     Write-Host "`n📋 Solution Components Retrieved:" -ForegroundColor Magenta
     Write-Host "=================================" -ForegroundColor Magenta
     
-    if ($ComponentsData.value -and $ComponentsData.value.Count -gt 0) {
-        Write-Host "Total components found: $($ComponentsData.value.Count)" -ForegroundColor Yellow
+    # Handle different data formats based on the API endpoint used
+    $components = @()
+    if ($UseRootComponentsOnly) {
+        # Data from solutioncomponents table
+        if ($ComponentsData.value -and $ComponentsData.value.Count -gt 0) {
+            $components = $ComponentsData.value | ForEach-Object {
+                # Get component type name from a lookup table
+                $componentTypeName = Get-ComponentTypeName -ComponentType $_.componenttype
+                
+                [PSCustomObject]@{
+                    DisplayName = "(Root Component - $componentTypeName)"
+                    ComponentType = $_.componenttype
+                    ComponentTypeName = $componentTypeName
+                    ObjectId = $_.objectid
+                    CreateOn = $_.createdon
+                    ModifiedOn = $_.modifiedon
+                    IsRootComponent = $true
+                }
+            }
+        }
+    } else {
+        # Data from msdyn_solutioncomponentsummaries table
+        if ($ComponentsData.value -and $ComponentsData.value.Count -gt 0) {
+            $components = $ComponentsData.value | ForEach-Object {
+                [PSCustomObject]@{
+                    DisplayName = if ($_.msdyn_displayname) { $_.msdyn_displayname } else { "(No display name)" }
+                    ComponentType = $_.msdyn_componenttype
+                    ComponentTypeName = if ($_.msdyn_componenttypename) { $_.msdyn_componenttypename } else { "(No type name)" }
+                    ObjectId = $_.msdyn_objectid
+                    CreateOn = $_.msdyn_createdon
+                    ModifiedOn = $_.msdyn_modifiedon
+                    IsRootComponent = $false
+                }
+            }
+        }
+    }
+    
+    if ($components.Count -gt 0) {
+        Write-Host "Total components found: $($components.Count)" -ForegroundColor Yellow
+        
+        if ($UseRootComponentsOnly) {
+            Write-Host "✅ Filtered to root components only (explicitly added to solution)" -ForegroundColor Green
+        }
+        
         Write-Host ""
         
         # Prepare data for table formatting
-        $tableData = $ComponentsData.value | ForEach-Object {
-            $displayName = if ($_.msdyn_displayname) { $_.msdyn_displayname } else { "(No display name)" }
-            $componentType = $_.msdyn_componenttype
-            $componentTypeName = if ($_.msdyn_componenttypename) { $_.msdyn_componenttypename } else { "(No type name)" }
+        $tableData = $components | ForEach-Object {
+            $displayName = $_.DisplayName
+            $componentType = $_.ComponentType
+            $componentTypeName = $_.ComponentTypeName
             
             # Truncate long names for better table display
             $truncatedDisplayName = if ($displayName.Length -gt 60) { $displayName.Substring(0, 57) + "..." } else { $displayName }
@@ -126,13 +172,33 @@ function Format-ComponentsOutput {
                 "Display Name" = $truncatedDisplayName
                 "Type ID" = $componentType
                 "Type Name" = $truncatedTypeName
+                "Object ID" = $_.ObjectId
+                "Selected" = if ($UseInteractiveSelection) { "[ ]" } else { "[X]" }
             }
         }
         
         # Display the table with colors
-        Write-Host "┌──────────────────────────────────────────────────────────────┬─────────┬─────────────────────────────────────┐" -ForegroundColor Cyan
-        Write-Host "│ Display Name                                                 │ Type ID │ Type Name                           │" -ForegroundColor Cyan
-        Write-Host "├──────────────────────────────────────────────────────────────┼─────────┼─────────────────────────────────────┤" -ForegroundColor Cyan
+        $headerFormat = if ($UseInteractiveSelection) {
+            "┌──────────────────────────────────────────────────────────────┬─────────┬─────────────────────────────────────┬──────────┐"
+        } else {
+            "┌──────────────────────────────────────────────────────────────┬─────────┬─────────────────────────────────────┐"
+        }
+        
+        Write-Host $headerFormat -ForegroundColor Cyan
+        
+        if ($UseInteractiveSelection) {
+            Write-Host "│ Display Name                                                 │ Type ID │ Type Name                           │ Selected │" -ForegroundColor Cyan
+        } else {
+            Write-Host "│ Display Name                                                 │ Type ID │ Type Name                           │" -ForegroundColor Cyan
+        }
+        
+        $separatorFormat = if ($UseInteractiveSelection) {
+            "├──────────────────────────────────────────────────────────────┼─────────┼─────────────────────────────────────┼──────────┤"
+        } else {
+            "├──────────────────────────────────────────────────────────────┼─────────┼─────────────────────────────────────┤"
+        }
+        
+        Write-Host $separatorFormat -ForegroundColor Cyan
         
         foreach ($row in $tableData) {
             $displayNameFormatted = $row."Display Name".PadRight(60)
@@ -145,23 +211,90 @@ function Format-ComponentsOutput {
             Write-Host $typeIdFormatted -ForegroundColor Yellow -NoNewline
             Write-Host " │ " -ForegroundColor Cyan -NoNewline
             Write-Host $typeNameFormatted -ForegroundColor Green -NoNewline
+            
+            if ($UseInteractiveSelection) {
+                $selectedFormatted = $row."Selected".PadRight(8)
+                Write-Host " │ " -ForegroundColor Cyan -NoNewline
+                Write-Host $selectedFormatted -ForegroundColor White -NoNewline
+            }
+            
             Write-Host " │" -ForegroundColor Cyan
         }
         
-        Write-Host "└──────────────────────────────────────────────────────────────┴─────────┴─────────────────────────────────────┘" -ForegroundColor Cyan
+        $footerFormat = if ($UseInteractiveSelection) {
+            "└──────────────────────────────────────────────────────────────┴─────────┴─────────────────────────────────────┴──────────┘"
+        } else {
+            "└──────────────────────────────────────────────────────────────┴─────────┴─────────────────────────────────────┘"
+        }
+        
+        Write-Host $footerFormat -ForegroundColor Cyan
         
         # Display component type summary
         Write-Host "`n📊 Component Type Summary:" -ForegroundColor Cyan
         Write-Host "─────────────────────────" -ForegroundColor Cyan
-        $ComponentsData.value | Group-Object msdyn_componenttype | Sort-Object Name | ForEach-Object {
-            $typeName = ($_.Group[0].msdyn_componenttypename -replace "Customization\.Type_", "")
+        $components | Group-Object ComponentType | Sort-Object Name | ForEach-Object {
+            $typeName = ($_.Group[0].ComponentTypeName -replace "Customization\.Type_", "")
             Write-Host "  📦 Type $($_.Name): $($_.Count) components ($typeName)" -ForegroundColor White
         }
         
-        Write-Host "`n💡 Tip: Use 'Y' to proceed with migration or 'N' to cancel" -ForegroundColor Yellow
+        if ($UseInteractiveSelection) {
+            Write-Host "`n💡 Interactive selection coming next..." -ForegroundColor Yellow
+        } else {
+            Write-Host "`n💡 Tip: Use 'Y' to proceed with migration or 'N' to cancel" -ForegroundColor Yellow
+        }
+        
+        # Return the components for further processing
+        return $components
     }
     else {
         Write-Host "No components found." -ForegroundColor Yellow
+        return @()
+    }
+}
+
+function Get-ComponentTypeName {
+    <#
+    .SYNOPSIS
+    Gets a friendly name for component type IDs
+    #>
+    param($ComponentType)
+    
+    switch ($ComponentType) {
+        1 { return "Entity" }
+        2 { return "Attribute" }
+        9 { return "Option Set" }
+        10 { return "Entity Relationship" }
+        16 { return "Display String" }
+        20 { return "Role" }
+        21 { return "Role Privilege" }
+        24 { return "Form" }
+        25 { return "Organization" }
+        26 { return "Saved Query" }
+        29 { return "Process/Flow" }
+        31 { return "Report" }
+        35 { return "Web Resource" }
+        36 { return "Article Template" }
+        37 { return "Contract Template" }
+        38 { return "E-mail Template" }
+        39 { return "Mail Merge Template" }
+        44 { return "Duplicate Rule" }
+        45 { return "Duplicate Rule Condition" }
+        46 { return "Entity Map" }
+        47 { return "Attribute Map" }
+        48 { return "Ribbon Command" }
+        50 { return "View" }
+        59 { return "Chart" }
+        60 { return "Form" }
+        61 { return "Web Resource" }
+        62 { return "Sitemap" }
+        70 { return "Field Security Profile" }
+        90 { return "Plugin Type" }
+        91 { return "Plugin Assembly" }
+        92 { return "SDK Message Processing Step" }
+        93 { return "SDK Message Processing Step Image" }
+        95 { return "Service Endpoint" }
+        10112 { return "Connection Reference" }
+        default { return "Unknown Type ($ComponentType)" }
     }
 }
 
@@ -286,11 +419,103 @@ function Move-ComponentToSolution {
     }
 }
 
-function Process-ComponentMigration {
+function Get-InteractiveComponentSelection {
     <#
     .SYNOPSIS
-    Processes all components and moves them to appropriate solutions
+    Allows user to interactively select which components to migrate
     #>
+    param($Components)
+    
+    Write-Host "`n🎯 Interactive Component Selection:" -ForegroundColor Magenta
+    Write-Host "===================================" -ForegroundColor Magenta
+    Write-Host "Select which components you want to migrate:" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "Options:" -ForegroundColor Yellow
+    Write-Host "  - Enter component numbers separated by commas (e.g., 1,3,5)" -ForegroundColor Gray
+    Write-Host "  - Enter ranges with hyphens (e.g., 1-5,8,10-12)" -ForegroundColor Gray
+    Write-Host "  - Enter 'all' to select all components" -ForegroundColor Gray
+    Write-Host "  - Enter 'none' to cancel migration" -ForegroundColor Gray
+    Write-Host ""
+    
+    # Display numbered list of components
+    for ($i = 0; $i -lt $Components.Count; $i++) {
+        $component = $Components[$i]
+        $number = $i + 1
+        
+        Write-Host "  $($number.ToString().PadRight(3)) │ " -ForegroundColor White -NoNewline
+        Write-Host "$($component.DisplayName.PadRight(50)) │ " -ForegroundColor Cyan -NoNewline
+        Write-Host "$($component.ComponentTypeName)" -ForegroundColor Green
+    }
+    
+    Write-Host ""
+    Write-Host "Enter your selection: " -ForegroundColor Yellow -NoNewline
+    $selection = Read-Host " "
+    
+    # Parse selection
+    $selectedComponents = @()
+    
+    if ($selection.ToLower() -eq 'all') {
+        $selectedComponents = $Components
+        Write-Host "✅ Selected all $($Components.Count) components" -ForegroundColor Green
+    } elseif ($selection.ToLower() -eq 'none') {
+        Write-Host "❌ Migration cancelled" -ForegroundColor Red
+        return @()
+    } else {
+        # Parse number ranges and individual numbers
+        $indices = @()
+        $parts = $selection -split ','
+        
+        foreach ($part in $parts) {
+            $part = $part.Trim()
+            if ($part -match '^(\d+)-(\d+)$') {
+                # Range
+                $start = [int]$matches[1]
+                $end = [int]$matches[2]
+                for ($i = $start; $i -le $end; $i++) {
+                    if ($i -ge 1 -and $i -le $Components.Count) {
+                        $indices += ($i - 1)
+                    }
+                }
+            } elseif ($part -match '^\d+$') {
+                # Single number
+                $num = [int]$part
+                if ($num -ge 1 -and $num -le $Components.Count) {
+                    $indices += ($num - 1)
+                }
+            }
+        }
+        
+        # Remove duplicates and sort
+        $indices = $indices | Sort-Object -Unique
+        
+        foreach ($index in $indices) {
+            $selectedComponents += $Components[$index]
+        }
+        
+        if ($selectedComponents.Count -gt 0) {
+            Write-Host "✅ Selected $($selectedComponents.Count) components:" -ForegroundColor Green
+            foreach ($comp in $selectedComponents) {
+                Write-Host "  • $($comp.DisplayName)" -ForegroundColor White
+            }
+        } else {
+            Write-Host "❌ No valid components selected" -ForegroundColor Red
+            return @()
+        }
+    }
+    
+    Write-Host ""
+    Write-Host "❓ Proceed with migration of selected components? (Y/N): " -ForegroundColor Yellow -NoNewline
+    $confirm = Read-Host
+    
+    if ($confirm -eq 'Y' -or $confirm -eq 'y') {
+        return $selectedComponents
+    } else {
+        Write-Host "Migration cancelled" -ForegroundColor Yellow
+        return @()
+    }
+}
+
+function Process-ComponentMigration {
     param($ComponentsData)
     
     Write-Host "`n🚀 Starting Component Migration Process..." -ForegroundColor Magenta
@@ -471,26 +696,97 @@ try {
     # Get the solution ID from Dataverse
     $solutionId = Get-SolutionId -SolutionName $featureSolutionName -AccessToken $accessToken -BaseEndpoint $D365BaseEndpoint
     
-    # Build the endpoint for solution components
-    $componentsEndpoint = "$D365BaseEndpoint/msdyn_solutioncomponentsummaries?`$filter=(msdyn_solutionid eq $solutionId)&`$select=msdyn_displayname,msdyn_schemaname,msdyn_componenttype,msdyn_componenttypename,msdyn_objectid&`$orderby=msdyn_componenttype"
+    # Prompt user for component filtering option
+    Write-Host "`n🔍 Component Filtering Options:" -ForegroundColor Magenta
+    Write-Host "===============================" -ForegroundColor Magenta
+    Write-Host "When you add components to a solution, Dynamics 365 can automatically include dependencies." -ForegroundColor Cyan
+    Write-Host "For example, adding a form might also pull in the entire entity, views, and other components." -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "Choose how to filter the components for migration:" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "1. " -ForegroundColor Green -NoNewline
+    Write-Host "Root Components Only " -ForegroundColor White -NoNewline
+    Write-Host "(Recommended) - Only migrate components you explicitly added" -ForegroundColor Gray
+    Write-Host "2. " -ForegroundColor Yellow -NoNewline
+    Write-Host "All Components " -ForegroundColor White -NoNewline
+    Write-Host "- Migrate all components including auto-added dependencies" -ForegroundColor Gray
+    Write-Host "3. " -ForegroundColor Cyan -NoNewline
+    Write-Host "Interactive Selection " -ForegroundColor White -NoNewline
+    Write-Host "- Review and manually select components to migrate" -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "Enter your choice (1, 2, or 3): " -ForegroundColor Yellow -NoNewline
+    $filterChoice = Read-Host " "
+    
+    # Validate choice
+    while ($filterChoice -notin @('1', '2', '3')) {
+        Write-Host "❌ Invalid choice. Please enter 1, 2, or 3: " -ForegroundColor Red -NoNewline
+        $filterChoice = Read-Host " "
+    }
+    
+    $useRootComponentsOnly = ($filterChoice -eq '1')
+    $useInteractiveSelection = ($filterChoice -eq '3')
+    
+    if ($useRootComponentsOnly) {
+        Write-Host "✅ Will filter to root components only (explicitly added components)" -ForegroundColor Green
+        # Use the solutioncomponents table with rootcomponentbehavior filter for root components only
+        # Include components where rootcomponentbehavior is 0, 1, or null (explicitly added components)
+        # Exclude rootcomponentbehavior = 2 (shell only/dependencies)
+        $componentsEndpoint = "$D365BaseEndpoint/solutioncomponents?`$filter=(_solutionid_value eq '$solutionId') and (rootcomponentbehavior ne 2)&`$select=componenttype,objectid,createdon,modifiedon,rootcomponentbehavior&`$expand=solutionid(`$select=uniquename,friendlyname)&`$orderby=componenttype"
+    } elseif ($useInteractiveSelection) {
+        Write-Host "✅ Will show all components for interactive selection" -ForegroundColor Green
+        # Use the detailed summary table for interactive selection
+        $componentsEndpoint = "$D365BaseEndpoint/msdyn_solutioncomponentsummaries?`$filter=(msdyn_solutionid eq $solutionId)&`$select=msdyn_displayname,msdyn_schemaname,msdyn_componenttype,msdyn_componenttypename,msdyn_objectid,msdyn_createdon,msdyn_modifiedon&`$orderby=msdyn_componenttype"
+    } else {
+        Write-Host "✅ Will include all components (root + dependencies)" -ForegroundColor Green
+        # Use the original detailed summary table for all components
+        $componentsEndpoint = "$D365BaseEndpoint/msdyn_solutioncomponentsummaries?`$filter=(msdyn_solutionid eq $solutionId)&`$select=msdyn_displayname,msdyn_schemaname,msdyn_componenttype,msdyn_componenttypename,msdyn_objectid&`$orderby=msdyn_componenttype"
+    }
     
     # Make the API call to get solution components
     $componentsData = Invoke-D365WebApi -Endpoint $componentsEndpoint -AccessToken $accessToken
     
     # Format and display results
-    Format-ComponentsOutput -ComponentsData $componentsData
+    $components = Format-ComponentsOutput -ComponentsData $componentsData -UseRootComponentsOnly $useRootComponentsOnly -UseInteractiveSelection $useInteractiveSelection
     
-    # Ask user if they want to proceed with migration
-    Write-Host "`n❓ Do you want to proceed with component migration? (Y/N): " -ForegroundColor Yellow -NoNewline
-    $userResponse = Read-Host
+    if ($components.Count -eq 0) {
+        Write-Host "No components found to migrate." -ForegroundColor Yellow
+        exit 0
+    }
     
-    if ($userResponse -eq 'Y' -or $userResponse -eq 'y') {
+    # Handle interactive selection
+    if ($useInteractiveSelection) {
+        $components = Get-InteractiveComponentSelection -Components $components
+        if ($components.Count -eq 0) {
+            Write-Host "Migration cancelled or no components selected." -ForegroundColor Yellow
+            exit 0
+        }
+    } else {
+        # Ask user if they want to proceed with migration
+        Write-Host "`n❓ Do you want to proceed with component migration? (Y/N): " -ForegroundColor Yellow -NoNewline
+        $userResponse = Read-Host
+        
+        if ($userResponse -ne 'Y' -and $userResponse -ne 'y') {
+            Write-Host "Migration cancelled by user." -ForegroundColor Yellow
+            exit 0
+        }
+    }
+    
+    # Convert components to the format expected by Process-ComponentMigration
+    $componentsDataForMigration = @{
+        value = $components | ForEach-Object {
+            [PSCustomObject]@{
+                msdyn_displayname = $_.DisplayName
+                msdyn_componenttype = $_.ComponentType
+                msdyn_objectid = $_.ObjectId
+            }
+        }
+    }
         # Check if target solutions exist
         $shouldContinue = Test-TargetSolutionsExist
         
         if ($shouldContinue) {
             # Process component migration
-            $migrationResults = Process-ComponentMigration -ComponentsData $componentsData
+            $migrationResults = Process-ComponentMigration -ComponentsData $componentsDataForMigration
             
             # Show affected/updated solutions summary
             Write-Host "`n🎯 Affected Target Solutions Summary:" -ForegroundColor Magenta
@@ -617,9 +913,6 @@ try {
         } else {
             Write-Host "Migration cancelled due to missing solutions." -ForegroundColor Yellow
         }
-    } else {
-        Write-Host "Migration cancelled by user." -ForegroundColor Yellow
-    }
     
     Write-Host "`n🎉 Script completed successfully!" -ForegroundColor Green
 }
