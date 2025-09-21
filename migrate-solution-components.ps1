@@ -306,7 +306,7 @@ function Test-TargetSolutionsExist {
     
     Write-Host "`n🔍 Checking if target solutions exist..." -ForegroundColor Cyan
     
-    $targetSolutions = @("main", "connectionreference", "flows", "webresources", "plugins")
+    $targetSolutions = @("core", "connectionreference", "flows", "webresources", "plugins")
     $existingSolutions = @()
     $missingSolutions = @()
     
@@ -364,7 +364,7 @@ function Get-TargetSolutionName {
         61 { return "webresources" }  # Web Resource -> webresources solution
         91 { return "plugins" }       # Plugin Assembly -> plugins solution
         92 { return "plugins" }       # SDK Message Processing Step -> plugins solution
-        default { return "main" }      # Unknown type -> main solution
+        default { return "core" }      # Unknown type -> core solution
     }
 }
 
@@ -664,7 +664,7 @@ try {
     Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
     Write-Host "All Other Component Types".PadRight(39) -ForegroundColor White -NoNewline
     Write-Host " │ " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "main".PadRight(31) -ForegroundColor Green -NoNewline
+    Write-Host "core".PadRight(31) -ForegroundColor Green -NoNewline
     Write-Host " │" -ForegroundColor DarkCyan
     
     Write-Host "└─────────────┴─────────────────────────────────────────┴─────────────────────────────────┘" -ForegroundColor DarkCyan
@@ -676,7 +676,7 @@ try {
     Write-Host "  4️⃣  Provide detailed migration summary" -ForegroundColor Gray
     
     Write-Host "`n⚠️  Prerequisites:" -ForegroundColor Yellow
-    Write-Host "  • Target solutions (main, connectionreference, flows, webresources, plugins) must exist" -ForegroundColor Gray
+    Write-Host "  • Target solutions (core, connectionreference, flows, webresources, plugins) must exist" -ForegroundColor Gray
     Write-Host "  • You must have appropriate permissions to modify solutions" -ForegroundColor Gray
     
     # Prompt for feature solution name
